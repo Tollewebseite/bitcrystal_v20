@@ -18,7 +18,7 @@
 extern bool fTestNet;
 static inline unsigned short GetDefaultPort(const bool testnet = fTestNet)
 {
-    return testnet ? 9398 : 9399;
+    return testnet ? 9298 : 9299;
 }
 
 
