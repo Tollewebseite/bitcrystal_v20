@@ -112,9 +112,10 @@ struct my_rawtransactioninformation_
 	int confirmations;
 	boost::int64_t time;
 	boost::int64_t blocktime;
+	unsigned int size;
 };
 typedef my_rawtransactioninformation_ my_rawtransactioninformation;
-extern void getrawtransactiondetails(std::string txid, my_rawtransactioninformation * my);
+extern void getrawtransactiondetails(std::string txid, my_rawtransactioninformation & my);
 
 json_spirit::Object JSONRPCError(int code, const std::string& message);
 

@@ -99,18 +99,19 @@ Value dumpprivkey(const Array& params, bool fHelp)
     return CBitcoinSecret(vchSecret, fCompressed).ToString();
 }
 
-void getrawtransactiondetails(string txid, my_rawtransactioninformation * my)
+void getrawtransactiondetails(string txid, my_rawtransactioninformation & my)
 {
 	Value ret;
 	Array par;
 	par.push_back(txid);
 	par.push_back(1);
+	my.size = 0;
 	try {
 		ret = getrawtransaction(par, false);
 	} catch (runtime_error ex) {
-		my = NULL;
+		return;
 	} catch (Object ex) {
-		my = NULL;
+		return;
 	}
 	
 	Value val;
@@ -123,22 +124,22 @@ void getrawtransactiondetails(string txid, my_rawtransactioninformation * my)
 		val = find_value(obj, "hex");
 		if(val.type() != null_type)
 		{
-			my->hex = val.get_str();
+			my.hex = val.get_str();
 		}
 		val = find_value(obj, "txid");
 		if(val.type() != null_type)
 		{
-			my->txid = val.get_str();
+			my.txid = val.get_str();
 		}
 		val = find_value(obj, "version");
 		if(val.type() != null_type)
 		{
-			my->version = val.get_int();
+			my.version = val.get_int();
 		}
 		val = find_value(obj, "locktime");
 		if(val.type() != null_type)
 		{
-			my->locktime = val.get_int();
+			my.locktime = val.get_int();
 		}
 		val = find_value(obj, "vin");
 		if(val.type() != null_type)
@@ -183,7 +184,7 @@ void getrawtransactiondetails(string txid, my_rawtransactioninformation * my)
 					{
 						vin_s.sequence = val.get_int64();
 					}
-					my->vin.push_back(vin_s);
+					my.vin.push_back(vin_s);
 				}
 			}
 		}
@@ -229,31 +230,32 @@ void getrawtransactiondetails(string txid, my_rawtransactioninformation * my)
 							vout_s.scriptPubKey.addresses = find_value(obj3, "addresses").get_array(); 
 						}
 					}
-					my->vout.push_back(vout_s);
+					my.vout.push_back(vout_s);
 				}
 			}
 		}
 		val = find_value(obj, "blockhash");
 		if(val.type() != null_type)
 		{
-			my->blockhash = val.get_str();
+			my.blockhash = val.get_str();
 		}
 		val = find_value(obj, "confirmations");
 		if(val.type() != null_type)
 		{
-			my->confirmations = val.get_int();
+			my.confirmations = val.get_int();
 		}
 		val = find_value(obj, "time");
 		if(val.type() != null_type)
 		{
-			my->time = val.get_int64();
+			my.time = val.get_int64();
 		}
 		val = find_value(obj, "blocktime");
 		if(val.type() != null_type)
 		{
-			my->blockhash = val.get_int64();
+			my.blockhash = val.get_int64();
 		}
 	}
+	my.size = sizeof(my);
 }
 
 Value my_outputrawtransaction(const Array& params, bool fHelp)
@@ -261,8 +263,13 @@ Value my_outputrawtransaction(const Array& params, bool fHelp)
 	if (fHelp || params.size() != 1)
         throw runtime_error("fick die henne\n");
 	my_rawtransactioninformation my;
-	getrawtransactiondetails(params[0].get_str(), &my);
+	getrawtransactiondetails(params[0].get_str(), my);
 	string cool;
+	if(my.size == 0)
+	{
+		cool += "error in code";
+		return cool;
+	}
 	cool += my.vout.at(0).scriptPubKey.hex;
 	return cool;
 }
