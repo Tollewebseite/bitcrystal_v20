@@ -174,6 +174,136 @@ Value getaccountaddress(const Array& params, bool fHelp)
     return ret;
 }
 
+bool hasRedeemScript(string address)
+{
+	bool allok=false;
+	try
+	{
+		CBitcoinAddress addr(address);
+		return addr.IsScript();
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	} catch (std::exception ex) {
+		allok=false;
+		return allok;
+	}
+}
+
+bool GetMultisigAddresses(vector<my_multisigaddress> & my_multisigaddresses)
+{
+	bool allok=false;
+	bool ismultisigaddress=false;
+	my_multisigaddress my;
+    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& item, pwalletMain->mapAddressBook)
+    {
+        const CBitcoinAddress& address = item.first;
+        const string& strName = item.second;
+		ismultisigaddress=address.IsScript();
+        if (ismultisigaddress)
+		{
+			my.clear();
+			my.account=strName;
+            my.address=address.ToString();
+			CScript cScript;
+			const CScriptID& hash = boost::get<const CScriptID&>(address.Get());
+			pwalletMain->GetCScript(hash, cScript);
+			my.redeemScript=HexStr(cScript.begin(), cScript.end());
+			my.empty=false;
+			my_multisigaddresses.push_back(my);
+    	}
+	}
+	allok=my_multisigaddresses.size()!=0;
+	return allok;
+}
+
+Value getmultisigaddresses(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw runtime_error(
+            "getmultisigaddresses <bool>\n"
+            "Returns the list of addresses.");
+
+	bool set=params.size()==1;
+	vector<my_multisigaddress> setAddress;
+    Array arr;
+	bool allok = GetMultisigAddresses(setAddress);
+	string str;
+	if(!allok)
+	{
+		return arr;
+	}
+	int size = setAddress.size();
+	for(int i = 0; i < size; i++)
+	{
+		Object entry;
+		entry.push_back(Pair("account", setAddress.at(i).account));
+		entry.push_back(Pair("address", setAddress.at(i).address));
+		entry.push_back(Pair("redeemScript", setAddress.at(i).redeemScript));
+		arr.push_back(entry);
+	}
+	return arr;
+}
+
+bool GetMultisigAccountAddresses(string & strAccount, vector<my_multisigaddress>& setAddress)
+{
+	vector<string> names;
+	vector<my_multisigaddress> setAddresses;
+	Array arr2;
+	bool allok=GetMultisigAddresses(setAddresses);
+	if(!allok)
+		return allok;
+    int size = setAddresses.size();
+	for(int i = 0; i < size; i++)
+	{
+		if(setAddresses.at(i).account.compare(strAccount)==0)
+			setAddress.push_back(setAddresses.at(i));
+	}
+	allok=setAddress.size()!=0;
+	return allok;
+}
+
+bool GetMultisigAccountAddress(string & strAccount, my_multisigaddress & my)
+{
+	vector<my_multisigaddress>setAddress;
+    bool allok=GetMultisigAccountAddresses(strAccount, setAddress);
+	if(!allok)
+	{
+		return allok;
+	}
+	my.clear();
+	my.account=setAddress.at(0).account;
+	my.address=setAddress.at(0).address;
+	my.redeemScript=setAddress.at(0).redeemScript;
+	return true;
+}
+
+Value getmultisigaccountaddress(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "getmultisigaccountaddress <account>\n"
+            "Returns the current BitCrystal address for receiving payments to this account.");
+
+    // Parse the account first so we don't generate a key if there's an error
+    string strAccount = AccountFromValue(params[0]);
+	string noaddressesfound = "No addresses found!";
+	my_multisigaddress my;
+	bool allok = GetMultisigAccountAddress(strAccount,my);
+	if(!allok)
+	{
+		return noaddressesfound;
+    }
+	Object entry;
+	entry.push_back(Pair("account", my.account));
+	entry.push_back(Pair("address", my.address));
+	entry.push_back(Pair("redeemScript", my.redeemScript));
+	return entry;
+}
+
 
 
 Value setaccount(const Array& params, bool fHelp)
@@ -244,6 +374,34 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
             ret.push_back(address.ToString());
     }
     return ret;
+}
+
+Value getmultisigaddressesbyaccount(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "getmultisigaddressesbyaccount <account>\n"
+            "Returns the list of addresses for the given account.");
+
+    string strAccount = AccountFromValue(params[0]);
+
+	vector<my_multisigaddress> setAddress;
+    Array arr;
+	bool allok = GetMultisigAccountAddresses(strAccount, setAddress);
+	if(!allok)
+	{
+		return arr;
+	}
+	int size = setAddress.size();
+	for(int i = 0; i < size; i++)
+	{
+		Object entry;
+		entry.push_back(Pair("account", setAddress.at(i).account));
+		entry.push_back(Pair("address", setAddress.at(i).address));
+		entry.push_back(Pair("redeemScript", setAddress.at(i).redeemScript));
+		arr.push_back(entry);
+	}
+	return arr;
 }
 
 Value sendtoaddress(const Array& params, bool fHelp)

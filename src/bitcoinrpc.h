@@ -70,6 +70,15 @@ struct my_scriptsig_
 {
 	std::string asm_;
 	std::string hex;
+	void clear()
+	{
+		asm_="";
+		hex="";
+	}
+	my_scriptsig_()
+	{
+		this->clear();
+	}
 };
 
 struct my_scriptpubkey_
@@ -79,6 +88,17 @@ struct my_scriptpubkey_
 	int reqSigs;
 	std::string type;
 	json_spirit::Array addresses;
+	void clear()
+	{
+		asm_ = "";
+		hex = "";
+		reqSigs=0;
+		addresses.clear();
+	}
+	my_scriptpubkey_()
+	{
+		this->clear();
+	}
 };
 typedef struct my_scriptsig_ my_scriptsig;
 typedef struct my_scriptpubkey_ my_scriptpubkey;
@@ -89,6 +109,17 @@ struct my_vin_
 	int vout;
 	my_scriptsig scriptSig;
 	boost::int64_t sequence;
+	void clear()
+	{
+		txid = "";
+		vout = 0;
+		scriptSig.clear();
+		sequence=0;
+	}
+	my_vin_()
+	{
+		this->clear();
+	}
 };
 typedef struct my_vin_ my_vin;
 
@@ -97,6 +128,16 @@ struct my_vout_
 	int64 value;
 	int n;
 	my_scriptpubkey scriptPubKey;
+	void clear()
+	{
+		value = 0;
+		n = 0;
+		scriptPubKey.clear();
+	}
+	my_vout_()
+	{
+		this->clear();
+	}
 };
 typedef struct my_vout_ my_vout;
 
@@ -112,11 +153,122 @@ struct my_rawtransactioninformation_
 	int confirmations;
 	boost::int64_t time;
 	boost::int64_t blocktime;
-	unsigned int size;
+	bool empty;
+	void clear() {
+		hex="";
+		txid="";
+		version=0;
+		locktime=0;
+		vin.clear();
+		vout.clear();
+		blockhash="";
+		confirmations=0;
+		time=0;
+		blocktime=0;
+		empty=true;
+	}
+	my_transactioninformation_() {
+		this->clear();
+	}
 };
-typedef my_rawtransactioninformation_ my_rawtransactioninformation;
-extern void getrawtransactiondetails(std::string txid, my_rawtransactioninformation & my);
-
+typedef struct my_rawtransactioninformation_ my_rawtransactioninformation;
+struct my_rawtransactionlist_
+{
+	std::string account;
+	std::string address;
+	std::string category;
+	int64 amount;
+	int confirmations;
+	bool generated;
+	std::string blockhash;
+	int blockindex;
+	boost::int64_t blocktime;
+	std::string txid;
+	boost::int64_t time;
+	boost::int64_t timereceived;
+	bool empty;
+	void clear() {
+		account="";
+		address="";
+		category="";
+		amount=0;
+		confirmations=0;
+		generated=false;
+		blockhash="";
+		blockindex=0;
+		blocktime=0;
+		txid="";
+		time=0;
+		timereceived=0;
+		empty=true;
+	}
+	my_transactionlist_() {
+		this->clear();
+	}
+};
+typedef struct my_rawtransactionlist_ my_rawtransactionlist;
+struct my_rawlistunspent_
+{
+	std::string txid;
+	int vout;
+	std::string address;
+	std::string account;
+	std::string scriptPubKey;
+	std::string redeemScript;
+	int64 amount;
+	int confirmations;
+	bool empty;
+	void clear() {
+		txid="";
+		vout=0;
+		address="";
+		account="";
+		scriptPubKey="";
+		redeemScript="";
+		amount=0;
+		confirmations=0;
+		empty=true;
+	}
+	bool hasRedeemScript() {
+		return !empty && redeemScript.compare("")!=0;
+	}
+	my_rawlistunspent_() {
+		this->clear();
+	}
+};
+typedef struct my_rawlistunspent_ my_rawlistunspent;
+struct my_multisigaddress_
+{
+	std::string address;
+	std::string account;
+	std::string redeemScript;
+	bool empty;
+	void clear() {
+		address="";
+		account="";
+		redeemScript="";
+		empty=true;
+	}
+	bool hasRedeemScript() {
+		return !empty && redeemScript.compare("")!=0;
+	}
+	my_multisigaddress_() {
+		this->clear();
+	}
+};
+typedef struct my_multisigaddress_ my_multisigaddress;
+extern bool getrawtransactiondetails(std::string & txid, my_rawtransactioninformation & my);
+extern bool getrawtransactionlist(std::string & account, std::vector<my_rawtransactionlist> & my_transactions);
+extern bool getrawtransactionlist_multisig(std::string & account, std::vector<my_rawtransactionlist> & my_transactions);
+extern bool getrawlistunspent(std::vector<my_rawlistunspent> & my_unspenttransactions);
+extern bool getrawlistunspent_multisig(std::vector<my_rawlistunspent> & my_unspenttransactions);
+extern bool getrawlistunspentbyinformation_multisig(std::string & address_or_account, std::vector<my_rawlistunspent> & my_unspenttransactions);
+extern bool GetMultisigAddresses(std::vector<my_multisigaddress> & my_multisigaddresses);
+extern bool GetMultisigAccountAddresses(std::string & strAccount, std::vector<my_multisigaddress>& setAddress);
+extern bool GetMultisigAccountAddress(std::string & strAccount, my_multisigaddress & my);
+extern bool hasRedeemScript(std::string address);
+extern bool mygetnewaddress(std::string strAccount, std::string & myaddress);
+extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, int64 amount, int64 fee, json_spirit::Array & params);
 json_spirit::Object JSONRPCError(int code, const std::string& message);
 
 void StartRPCThreads();
@@ -203,9 +355,12 @@ extern json_spirit::Value submitblock(const json_spirit::Array& params, bool fHe
 //extern json_spirit::Value mygetnewaddress(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value getnewaddress(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
 extern json_spirit::Value getaccountaddress(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getmultisigaddresses(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getmultisigaccountaddress(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value setaccount(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getaccount(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getaddressesbyaccount(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getmultisigaddressesbyaccount(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value sendtoaddress(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value signmessage(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value verifymessage(const json_spirit::Array& params, bool fHelp);
@@ -251,4 +406,6 @@ extern json_spirit::Value getblock(const json_spirit::Array& params, bool fHelp)
 extern json_spirit::Value gettxoutsetinfo(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value gettxout(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value my_outputrawtransaction(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value listtransactions_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value listunspent_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 #endif

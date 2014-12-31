@@ -6,6 +6,7 @@
 #include "bitcoinrpc.h"
 #include "ui_interface.h"
 #include "base58.h"
+#include "convert_functions.h"
 #include <fstream>
 
 #include <boost/lexical_cast.hpp>
@@ -14,6 +15,7 @@
 
 using namespace json_spirit;
 using namespace std;
+using namespace my_convert_functions;
 
 class CTxDump
 {
@@ -99,47 +101,55 @@ Value dumpprivkey(const Array& params, bool fHelp)
     return CBitcoinSecret(vchSecret, fCompressed).ToString();
 }
 
-void getrawtransactiondetails(string txid, my_rawtransactioninformation & my)
+bool getrawtransactiondetails(std::string & txid, my_rawtransactioninformation & my)
 {
 	Value ret;
 	Array par;
 	par.push_back(txid);
 	par.push_back(1);
-	my.size = 0;
+	bool allok=true;
 	try {
 		ret = getrawtransaction(par, false);
 	} catch (runtime_error ex) {
-		return;
+		allok=false;
+		return allok;
 	} catch (Object ex) {
-		return;
+		allok=false;
+		return allok;
 	}
 	
 	Value val;
 	int size;
-	my_vin vin_s = { 0 };
-	my_vout vout_s = { 0 };
+	my_vin vin_s;
+	my_vout vout_s;
+	try{
 	if (ret.type() == obj_type)
     {
+		//outs += ",hallo-1";
 		Object obj = ret.get_obj();
 		val = find_value(obj, "hex");
 		if(val.type() != null_type)
 		{
 			my.hex = val.get_str();
+			//outs += ",hallo-2";
 		}
 		val = find_value(obj, "txid");
 		if(val.type() != null_type)
 		{
 			my.txid = val.get_str();
+			//outs += ",hallo-3";
 		}
 		val = find_value(obj, "version");
 		if(val.type() != null_type)
 		{
 			my.version = val.get_int();
+			//outs += ",hallo-4";
 		}
 		val = find_value(obj, "locktime");
 		if(val.type() != null_type)
 		{
 			my.locktime = val.get_int();
+			//outs += ",hallo-5";
 		}
 		val = find_value(obj, "vin");
 		if(val.type() != null_type)
@@ -148,13 +158,15 @@ void getrawtransactiondetails(string txid, my_rawtransactioninformation & my)
 			{
 				Array vin = val.get_array();
 				size = vin.size();
+				//outs += ",hallo-6";
 				for(int i = 0; i < size; i++)
 				{
 					if(vin[i].type() != obj_type)
 					{
 						continue;
 					}
-					memset(&vin_s, 0, sizeof(vin_s));
+					//outs += ",hallo-7";
+					vin_s.clear();
 					
 					Object obj2 = vin[i].get_obj();
 					
@@ -162,11 +174,13 @@ void getrawtransactiondetails(string txid, my_rawtransactioninformation & my)
 					if(val.type() != null_type)
 					{
 						vin_s.txid = val.get_str();
+						//outs += ",hallo-8";
 					}
 					val = find_value(obj2, "vout");
 					if(val.type() != null_type)
 					{
 						vin_s.vout = val.get_int();
+						//outs += ",hallo-9";
 					}
 					val = find_value(obj2, "scriptSig");
 					Object obj3;
@@ -177,51 +191,66 @@ void getrawtransactiondetails(string txid, my_rawtransactioninformation & my)
 							obj3 = val.get_obj();
 							vin_s.scriptSig.asm_ = find_value(obj3, "asm").get_str();
 							vin_s.scriptSig.hex = find_value(obj3, "hex").get_str(); 							
+							//outs += ",hallo-10";
 						}
+						//outs += ",hallo-11";
 					}
 					val = find_value(obj2, "sequence");
 					if(val.type() != null_type)
 					{
 						vin_s.sequence = val.get_int64();
+						//outs += ",hallo-12";
 					}
 					my.vin.push_back(vin_s);
+					//outs += ",hallo-13";
 				}
+				//outs += ",hallo-14";
 			}
+			//outs += ",hallo-16";
 		}
+		//outs += ",hallo-17";
 		val = find_value(obj, "vout");
 		if(val.type() != null_type)
 		{
+			//outs += ",hallo-18";
 			if(val.type() == array_type)
 			{
+				//outs += ",hallo-19";
 				Array vout = val.get_array();
 				size = vout.size();
 				for(int i = 0; i < size; i++)
 				{
+					//outs += ",hallo-20";
 					if(vout[i].type() != obj_type)
 					{
 						continue;
 					}
-					memset(&vout_s, 0, sizeof(vout_s));
+					//outs += ",hallo-21";
+					vout_s.clear();
 					
 					Object obj2 = vout[i].get_obj();
 					
 					val = find_value(obj2, "value");
 					if(val.type() != null_type)
 					{
+						//outs += ",hallo-22";
 						vout_s.value = val.get_real();
 					}
 					 
 					val = find_value(obj2, "n");
 					if(val.type() != null_type)
 					{
+						//outs += ",hallo-23";
 						vout_s.n = val.get_int();
 					}
 					val = find_value(obj2, "scriptPubKey");
 					Object obj3;
 					if(val.type() != null_type)
 					{
+						//outs += ",hallo-24";
 						if(val.type() == obj_type)
 						{
+							//outs += ",hallo-25";
 							obj3 = val.get_obj();
 							vout_s.scriptPubKey.asm_ = find_value(obj3, "asm").get_str();
 							vout_s.scriptPubKey.hex = find_value(obj3, "hex").get_str();
@@ -230,6 +259,7 @@ void getrawtransactiondetails(string txid, my_rawtransactioninformation & my)
 							vout_s.scriptPubKey.addresses = find_value(obj3, "addresses").get_array(); 
 						}
 					}
+					//outs += ",hallo-26";
 					my.vout.push_back(vout_s);
 				}
 			}
@@ -237,25 +267,41 @@ void getrawtransactiondetails(string txid, my_rawtransactioninformation & my)
 		val = find_value(obj, "blockhash");
 		if(val.type() != null_type)
 		{
+			//outs += ",hallo-27";
 			my.blockhash = val.get_str();
 		}
 		val = find_value(obj, "confirmations");
 		if(val.type() != null_type)
 		{
+			//outs += ",hallo-28";
 			my.confirmations = val.get_int();
 		}
 		val = find_value(obj, "time");
 		if(val.type() != null_type)
 		{
+			//outs += ",hallo-29";
 			my.time = val.get_int64();
+			//outs+=",";
+			//outs+=get_string_of(my.time);
 		}
 		val = find_value(obj, "blocktime");
 		if(val.type() != null_type)
 		{
-			my.blockhash = val.get_int64();
+			//outs += ",hallo-30";
+			my.blocktime = val.get_int64();
+			//outs+=",";
+			//outs+=get_string_of(my.blocktime);
 		}
 	}
-	my.size = sizeof(my);
+	my.empty=false;
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	return allok;
 }
 
 Value my_outputrawtransaction(const Array& params, bool fHelp)
@@ -263,17 +309,487 @@ Value my_outputrawtransaction(const Array& params, bool fHelp)
 	if (fHelp || params.size() != 1)
         throw runtime_error("fick die henne\n");
 	my_rawtransactioninformation my;
-	getrawtransactiondetails(params[0].get_str(), my);
-	string cool;
-	if(my.size == 0)
+	string x = "";
+	x+=params[0].get_str();
+	bool allok = getrawtransactiondetails(x, my);
+	string t;
+	if(my.empty || !allok)
 	{
-		cool += "error in code";
-		return cool;
+		t += "error in code";
+		return t;
 	}
-	cool += my.vout.at(0).scriptPubKey.hex;
-	return cool;
+	t += my.vout.at(0).scriptPubKey.hex;
+	return t;
 }
 
+bool getrawtransactionlist(std::string & account, vector<my_rawtransactionlist> & my_transactions)
+{
+	Value ret;
+	Array par;
+	par.push_back(account);
+	bool allok=true;
+	try {
+		ret = listtransactions(par, false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	
+	Value val;
+	int size;
+	my_rawtransactionlist my;
+	try{
+		if (ret.type() == array_type)
+		{
+			Array & params = ret.get_array();
+			int size=params.size();
+			for(int i = 0; i < size; i++)
+			{
+				//outs += ",hallo-1";
+				my.clear();
+				Object obj = params[i].get_obj();
+				val = find_value(obj, "account");
+				if(val.type() != null_type)
+				{
+					my.account = val.get_str();
+					//outs += ",hallo-2";
+				}
+				val = find_value(obj, "address");
+				if(val.type() != null_type)
+				{
+					my.address = val.get_str();
+					//outs += ",hallo-3";
+				}
+				val = find_value(obj, "category");
+				if(val.type() != null_type)
+				{
+					my.category = val.get_str();
+					//outs += ",hallo-4";
+				}
+				val = find_value(obj, "amount");
+				if(val.type() != null_type)
+				{
+					my.amount = val.get_real();
+					//outs += ",hallo-5";
+				}
+				val = find_value(obj, "confirmations");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-27";
+					my.confirmations = val.get_int();
+				}
+				val = find_value(obj, "generated");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-28";
+					my.generated = val.get_bool();
+				}
+				val = find_value(obj, "blockhash");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-29";
+					my.blockhash = val.get_str();
+					//outs+=",";
+					//outs+=get_string_of(my.time);
+				}
+				val = find_value(obj, "blockindex");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-29";
+					my.blockindex = val.get_int();
+					//outs+=",";
+					//outs+=get_string_of(my.time);
+				}
+				val = find_value(obj, "blocktime");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-30";
+					my.blocktime = val.get_int64();
+					//outs+=",";
+					//outs+=get_string_of(my.blocktime);
+				}
+				val = find_value(obj, "txid");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-30";
+					my.txid = val.get_str();
+					//outs+=",";
+					//outs+=get_string_of(my.blocktime);
+				}
+				val = find_value(obj, "time");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-30";
+					my.time = val.get_int64();
+					//outs+=",";
+					//outs+=get_string_of(my.blocktime);
+				}
+				val = find_value(obj, "timereceived");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-30";
+					my.timereceived = val.get_int64();
+					//outs+=",";
+					//outs+=get_string_of(my.blocktime);
+				}
+				my.empty=false;
+				my_transactions.push_back(my);
+			}
+		}
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	return allok;
+}
+
+bool getrawtransactionlist_multisig(std::string & account, vector<my_rawtransactionlist> & my_transactions)
+{
+	vector<my_rawtransactionlist> my_transactions2;
+	bool allok = getrawtransactionlist(account, my_transactions2);
+	if(my_transactions2.size() == 0 || !allok)
+	{
+		return false;
+	}
+	int size = my_transactions2.size();
+	for(int i = 0; i < size; i++)
+	{
+		if(!hasRedeemScript(my_transactions2.at(i).address))
+			continue;
+		my_transactions.push_back(my_transactions2.at(i));
+	}
+	allok=my_transactions.size()!=0;
+	return allok;
+}
+
+Value listtransactions_multisig(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+        throw runtime_error("fick die henne\n");
+	vector<my_rawtransactionlist> my_transactions;
+	string x = "";
+	x+=params[0].get_str();
+	bool allok = getrawtransactionlist_multisig(x, my_transactions);
+	Array arr;
+	if(my_transactions.size() == 0 || !allok)
+	{
+		return arr;
+	}
+	int size = my_transactions.size();
+	for(int i = 0; i < size; i++)
+	{
+		Object entry;
+		entry.push_back(Pair("account",my_transactions.at(i).account));
+		entry.push_back(Pair("address",my_transactions.at(i).address));
+		entry.push_back(Pair("category",my_transactions.at(i).category));
+		entry.push_back(Pair("amount",my_transactions.at(i).amount));
+		entry.push_back(Pair("confirmations",my_transactions.at(i).confirmations));
+		entry.push_back(Pair("generated",my_transactions.at(i).generated));
+		entry.push_back(Pair("blockhash",my_transactions.at(i).blockhash));
+		entry.push_back(Pair("blockindex",my_transactions.at(i).blockindex));
+		entry.push_back(Pair("blocktime",my_transactions.at(i).blocktime));
+		entry.push_back(Pair("txid",my_transactions.at(i).txid));
+		entry.push_back(Pair("time",my_transactions.at(i).time));
+		entry.push_back(Pair("timereceived",my_transactions.at(i).timereceived));
+		arr.push_back(entry);
+	}
+	return arr;
+}
+
+bool getrawlistunspent(vector<my_rawlistunspent> & my_unspenttransactions)
+{
+	Value ret;
+	Array par;
+	par.push_back(0);
+	bool allok=true;
+	try {
+		ret = listunspent(par, false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	
+	Value val;
+	int size;
+	my_rawlistunspent my;
+	try{
+		if (ret.type() == array_type)
+		{
+			Array & params = ret.get_array();
+			int size=params.size();
+			for(int i = 0; i < size; i++)
+			{
+				//outs += ",hallo-1";
+				my.clear();
+				Object obj = params[i].get_obj();
+				val = find_value(obj, "txid");
+				if(val.type() != null_type)
+				{
+					my.txid = val.get_str();
+					//outs += ",hallo-2";
+				}
+				val = find_value(obj, "vout");
+				if(val.type() != null_type)
+				{
+					my.vout = val.get_int();
+					//outs += ",hallo-3";
+				}
+				val = find_value(obj, "address");
+				if(val.type() != null_type)
+				{
+					my.address = val.get_str();
+					//outs += ",hallo-4";
+				}
+				val = find_value(obj, "scriptPubKey");
+				if(val.type() != null_type)
+				{
+					my.scriptPubKey = val.get_str();
+					//outs += ",hallo-5";
+				}
+				val = find_value(obj, "amount");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-27";
+					my.amount = val.get_real();
+				}
+				val = find_value(obj, "confirmations");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-28";
+					my.confirmations = val.get_int();
+				}
+				val = find_value(obj, "redeemScript");
+				if(val.type() != null_type)
+				{
+					//outs += ",hallo-29";
+					my.redeemScript = val.get_str();
+					//outs+=",";
+					//outs+=get_string_of(my.time);
+				}
+				my.empty=false;
+				my_unspenttransactions.push_back(my);
+			}
+		}
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	return allok;
+}
+
+bool getrawlistunspent_multisig(vector<my_rawlistunspent> & my_unspenttransactions)
+{
+	bool allok=false;
+	vector<my_rawlistunspent> my_unspenttransactions2;
+	allok=getrawlistunspent(my_unspenttransactions2);
+	if(!allok)
+		return allok;
+	int size=my_unspenttransactions2.size();
+	if(size==0)
+		return false;
+	allok=false;
+	for(int i = 0; i < size;i++)
+	{
+		if(!my_unspenttransactions2.at(i).hasRedeemScript())
+		{
+			continue;
+		}
+		my_unspenttransactions.push_back(my_unspenttransactions2.at(i));
+		allok=true;
+	}
+	return allok;
+}
+bool getrawlistunspentbyinformation_multisig(string & address_or_account, vector<my_rawlistunspent> & my_unspenttransactions)
+{
+	if(!hasRedeemScript(address_or_account))
+	{
+		my_multisigaddress my;
+		if(!GetMultisigAccountAddress(address_or_account, my))
+			return false;
+		address_or_account=my.address;
+	}
+	vector<my_rawlistunspent> my_unspenttransactions2;
+	bool allok=getrawlistunspent(my_unspenttransactions2);
+	if(!allok)
+		return allok;
+	int size=my_unspenttransactions2.size();
+	if(size==0)
+		return false;
+	allok=false;
+	for(int i = 0; i < size;i++)
+	{
+		if(my_unspenttransactions2.at(i).address.compare(address_or_account)!=0)
+		{
+			continue;
+		}
+		my_unspenttransactions.push_back(my_unspenttransactions2.at(i));
+		allok=true;
+	}
+	return allok;
+}
+
+Value listunspent_multisig(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() > 1)
+        throw runtime_error("fick die henne\n");
+	bool set=params.size()!=1;
+	vector<my_rawlistunspent> my_unspenttransactions;
+	bool allok;
+	string x;
+	if(!set)
+		x+=params[0].get_str();
+	if(set)
+		allok = getrawlistunspent_multisig(my_unspenttransactions);
+	else
+		allok = getrawlistunspentbyinformation_multisig(x, my_unspenttransactions);
+	Array arr;
+	if(my_unspenttransactions.size() == 0 || !allok)
+	{
+		return arr;
+	}
+	
+	int size = my_unspenttransactions.size();
+	for(int i = 0; i < size; i++)
+	{
+		Object entry;
+		entry.push_back(Pair("txid",my_unspenttransactions.at(i).txid));
+		entry.push_back(Pair("vout",my_unspenttransactions.at(i).vout));
+		entry.push_back(Pair("address",my_unspenttransactions.at(i).address));
+		entry.push_back(Pair("scriptPubKey",my_unspenttransactions.at(i).scriptPubKey));
+		entry.push_back(Pair("redeemScript",my_unspenttransactions.at(i).redeemScript));
+		entry.push_back(Pair("amount",my_unspenttransactions.at(i).amount));
+		entry.push_back(Pair("confirmations",my_unspenttransactions.at(i).confirmations));
+		arr.push_back(entry);
+	}
+	return arr;
+}
+
+/*string get_vouts(string reedemScript,vector<my_rawtransactionlist> & my_transactions)
+{
+	int size  = my_transactions.size();
+	my_transactioninformation my;
+	bool all_ok;
+	string ret;
+	ret+="[";
+	bool useReedemScript=reedemScript.compare("")==0;
+	for(int i = 0; i < size; i++)
+	{
+		all_ok = getrawtransactiondetails(my_transactions.at(i).txid, my);
+		if(!all_ok)
+			continue;
+		int jSize = my.vout.size();
+		for(int j = 0; j < jSize; j++)
+		{
+			ret+="{\"txid\":\"";
+			ret+=my.txid;
+			ret+="\"";
+			ret+=",\"vout\":";
+			ret+=my.vout.at(i).n;
+			ret+="\"scriptPubKey\":\"";
+			ret+=my.vout.at(i).scriptPubKey.hex;
+			ret+="\"";
+			if(useReedemScript)
+			{
+				ret+=",\"reedemScript\":\"";
+				ret+=reedemScript;
+				ret+="\"";
+			}
+			ret+="}";
+			if(j+1!=jSize)
+				ret+=",";
+		}
+		my.clear();
+		if(i+1!=size)
+			ret+=",";
+	}
+	ret+="]";
+}
+*/
+bool mygetnewaddress(std::string strAccount, std::string & myaddress)
+{
+	if (!pwalletMain->IsLocked())
+      pwalletMain->TopUpKeyPool();
+
+    // Generate a new key that is added to wallet
+    CPubKey newKey;
+    if (!pwalletMain->GetKeyFromPool(newKey, false))
+        return false;
+    CKeyID keyID = newKey.GetID();
+
+    pwalletMain->SetAddressBookName(keyID, strAccount);
+
+    myaddress=CBitcoinAddress(keyID).ToString();
+	return true;
+}
+
+bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, int64 amount, int64 fee, Array & params)
+{
+	if(fee<=0)
+		fee=0.00001;
+	my_multisigaddress my;
+	if(!hasRedeemScript(account_or_address))
+	{
+		if(!GetMultisigAccountAddress(account_or_address,my))
+		{
+				return false;
+		}
+		account_or_address=my.address;
+	}
+	if(amount <= 0 || fee <= 0)
+		return false;
+	if(amount<=fee)
+		return false;
+	string change_address;
+	string change_account="multisig_change_address";
+	bool allok = mygetnewaddress(change_account, change_address);
+	if(!allok)
+		return false;
+	std::vector<my_rawlistunspent> my_unspenttransactions;
+	allok = getrawlistunspentbyinformation_multisig(account_or_address, my_unspenttransactions);
+	if(!allok)
+	{
+		return false;
+	}
+	Array arr;
+	int64 tAmount=amount+fee;
+	int64 currentAmount = 0;
+	int size=my_unspenttransactions.size();
+	for(int i = 0; i < size; i++)
+	{
+			if(currentAmount >= tAmount)
+			{
+				break;
+			}
+			Object obj;
+			obj.push_back(Pair("txid", my_unspenttransactions.at(i).txid));
+			obj.push_back(Pair("vout", my_unspenttransactions.at(i).vout));
+			obj.push_back(Pair("scriptPubKey", my_unspenttransactions.at(i).scriptPubKey));
+			obj.push_back(Pair("redeemScript", my_unspenttransactions.at(i).redeemScript));
+			arr.push_back(obj);
+			currentAmount+=my_unspenttransactions.at(i).amount;
+			if(i+1==size)
+				return false;
+	}
+	params.push_back(arr);
+	Object obj2;
+	int64 diff=currentAmount-amount+fee;
+	obj2.push_back(Pair(receive_address,amount));
+	if(diff>0)
+		obj2.push_back(Pair(change_address,diff));
+	params.push_back(obj2);
+}
 /*Array mygetnewaddress()
 {
 	Array array;
@@ -467,7 +983,7 @@ Value mycreatemultisigaddressoffiles(const Array& params, bool fHelp)
 		if(i+1==size)
 			throw JSONRPCError(RPC_WALLET_ERROR, "error!");
 	}
-	string rawtransaction = "'[{\"txid\":\"8f2427f2b9dbba0b80ab7f9ab9a7d6605c14f64b03aa04b73d880a7a03ade8aa\",\"vout\":1,\"scriptPubKey\":\"a914f55d81479219dced6dfe0eadfbfeb10daa0a3d8a87\",\"redeemScript\":\"5221025397ecf84a520f5ff9af4beaf43a0ee9da4ce787b91ab67d9863a7fed441355621039016b03bf64977d585061242033e38e5f023c5aba41145d497ef52f5582e583a52ae\"}]' '{\"mgFmgSZuubcR9RDZR7EypuZRRVXjZY22S8\":100}'";
+	string rawtransaction = "'[{\"txid\":\"MY_TXID\",\"vout\":VOUT,\"scriptPubKey\":\"SCRIPT_PUB_KEY\",\"redeemScript\":\"REEDEM_SCRIPT\"}]' '{\"RECEIVER\":100,\"your_change_address\":50}'";
 	string signrawtransaction = "'01000000c1f20e5301aae8ad037a0a883db704aa034bf6145c60d6a7b99a7fab800bbadbb9f227248f0100000000ffffffff0100e1f505000000001976a914081906b7089eef2ae9411b7ad9e323891a49d74088ac00000000' '[{\"txid\":\"8f2427f2b9dbba0b80ab7f9ab9a7d6605c14f64b03aa04b73d880a7a03ade8aa\",\"vout\":1,\"scriptPubKey\":\"a914f55d81479219dced6dfe0eadfbfeb10daa0a3d8a87\",\"redeemScript\":\"5221025397ecf84a520f5ff9af4beaf43a0ee9da4ce787b91ab67d9863a7fed441355621039016b03bf64977d585061242033e38e5f023c5aba41145d497ef52f5582e583a52ae\"}]' '[\"cW3rrh7R2EiKryGDH5AWFpNkY75226DLqMZh6LyUbo5kdN5dMKYK\"]'";
 }*/
 

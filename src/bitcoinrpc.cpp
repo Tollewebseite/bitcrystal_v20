@@ -217,9 +217,12 @@ static const CRPCCommand vRPCCommands[] =
 	{ "getnetworkhashps",       &getnetworkhashps,       true,      false },
     { "getnewaddress",          &getnewaddress,          true,      false },
     { "getaccountaddress",      &getaccountaddress,      true,      false },
+	{ "getmultisigaddresses",      &getmultisigaddresses,      true,      false },
+	{ "getmultisigaccountaddress",      &getmultisigaccountaddress,      true,      false },
     { "setaccount",             &setaccount,             true,      false },
     { "getaccount",             &getaccount,             false,     false },
     { "getaddressesbyaccount",  &getaddressesbyaccount,  true,      false },
+	{ "getmultisigaddressesbyaccount",  &getmultisigaddressesbyaccount,  true,      false },
     { "sendtoaddress",          &sendtoaddress,          false,     false },
     { "getreceivedbyaddress",   &getreceivedbyaddress,   false,     false },
     { "getreceivedbyaccount",   &getreceivedbyaccount,   false,     false },
@@ -266,6 +269,8 @@ static const CRPCCommand vRPCCommands[] =
     { "lockunspent",            &lockunspent,            false,     false },
     { "listlockunspent",        &listlockunspent,        false,     false },
 	{ "my_outputrawtransaction",        &my_outputrawtransaction,        false,     false },
+	{ "listtransactions_multisig",        &listtransactions_multisig,        false,     false },
+	{ "listunspent_multisig",        &listunspent_multisig,        false,     false },
 };
 
 CRPCTable::CRPCTable()
