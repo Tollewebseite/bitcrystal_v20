@@ -125,7 +125,7 @@ typedef struct my_vin_ my_vin;
 
 struct my_vout_
 {
-	int64 value;
+	double value;
 	int n;
 	my_scriptpubkey scriptPubKey;
 	void clear()
@@ -177,7 +177,7 @@ struct my_rawtransactionlist_
 	std::string account;
 	std::string address;
 	std::string category;
-	int64 amount;
+	double amount;
 	int confirmations;
 	bool generated;
 	std::string blockhash;
@@ -215,7 +215,7 @@ struct my_rawlistunspent_
 	std::string account;
 	std::string scriptPubKey;
 	std::string redeemScript;
-	int64 amount;
+	double amount;
 	int confirmations;
 	bool empty;
 	void clear() {
@@ -242,11 +242,17 @@ struct my_multisigaddress_
 	std::string address;
 	std::string account;
 	std::string redeemScript;
+	json_spirit::Array addressesJSON;
+	std::vector<std::string> addresses;
+	int nRequired;
 	bool empty;
 	void clear() {
 		address="";
 		account="";
 		redeemScript="";
+		addressesJSON.clear();
+		addresses.clear();
+		nRequired=0;
 		empty=true;
 	}
 	bool hasRedeemScript() {
@@ -268,7 +274,19 @@ extern bool GetMultisigAccountAddresses(std::string & strAccount, std::vector<my
 extern bool GetMultisigAccountAddress(std::string & strAccount, my_multisigaddress & my);
 extern bool hasRedeemScript(std::string address);
 extern bool mygetnewaddress(std::string strAccount, std::string & myaddress);
-extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, int64 amount, int64 fee, json_spirit::Array & params);
+extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, json_spirit::Array & params);
+extern bool GetPrivKey(std::string & address, std::string & privKey);
+extern bool hasPrivKey(std::string & address);
+extern bool GetPubKey(std::string & address);
+extern bool hasPubKey(std::string & address, std::string & pubKey);
+extern bool isMultisigAddress(std::string & address);
+extern bool GetBitcoinAddressOfPubKey(std::string & pubKey, std::string & address);
+extern bool IsValidPubKey(std::string & pubKey);
+extern bool IsMineBitcoinAddress(std::string & address);
+extern bool IsMinePubKey(std::string & pubKey);
+extern std::string encodeBase64Data(unsigned char * data, std::size_t & len);
+extern void decodeBase64Data(std::string & data, std::vector<unsigned char> & cpy, std::size_t & size);
+extern void decodeEnding(std::vector<unsigned char> & cpy, unsigned char * data, std::size_t & len);
 json_spirit::Object JSONRPCError(int code, const std::string& message);
 
 void StartRPCThreads();
@@ -408,4 +426,18 @@ extern json_spirit::Value gettxout(const json_spirit::Array& params, bool fHelp)
 extern json_spirit::Value my_outputrawtransaction(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value listtransactions_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value listunspent_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getprivkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value hasprivkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getpubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value haspubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value ismultisigaddress(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getbitcoinaddressofpubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value isvalidpubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value isminebitcoinaddress(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value isminepubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value createmultisigex(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
+extern json_spirit::Value addmultisigex(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
+extern json_spirit::Value createtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value createrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value decoderawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 #endif

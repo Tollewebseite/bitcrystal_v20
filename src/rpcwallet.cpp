@@ -212,6 +212,19 @@ bool GetMultisigAddresses(vector<my_multisigaddress> & my_multisigaddresses)
 			const CScriptID& hash = boost::get<const CScriptID&>(address.Get());
 			pwalletMain->GetCScript(hash, cScript);
 			my.redeemScript=HexStr(cScript.begin(), cScript.end());
+			std::vector<CTxDestination> addresses;
+			txnouttype whichType;
+			int nRequired;
+			ExtractDestinations(cScript, whichType, addresses, nRequired);
+			if (whichType != TX_MULTISIG)
+				continue;
+			BOOST_FOREACH(const CTxDestination& addr, addresses)
+			{
+				string x=CBitcoinAddress(addr).ToString();
+				my.addressesJSON.push_back(x);
+				my.addresses.push_back(x);
+			}
+			my.nRequired=nRequired;
 			my.empty=false;
 			my_multisigaddresses.push_back(my);
     	}
@@ -243,6 +256,8 @@ Value getmultisigaddresses(const Array& params, bool fHelp)
 		entry.push_back(Pair("account", setAddress.at(i).account));
 		entry.push_back(Pair("address", setAddress.at(i).address));
 		entry.push_back(Pair("redeemScript", setAddress.at(i).redeemScript));
+		entry.push_back(Pair("addresses", setAddress.at(i).addressesJSON));
+		entry.push_back(Pair("nRequired", setAddress.at(i).nRequired));
 		arr.push_back(entry);
 	}
 	return arr;
@@ -278,6 +293,8 @@ bool GetMultisigAccountAddress(string & strAccount, my_multisigaddress & my)
 	my.account=setAddress.at(0).account;
 	my.address=setAddress.at(0).address;
 	my.redeemScript=setAddress.at(0).redeemScript;
+	my.addressesJSON=setAddress.at(0).addressesJSON;
+	my.nRequired=setAddress.at(0).nRequired;
 	return true;
 }
 
@@ -301,6 +318,8 @@ Value getmultisigaccountaddress(const Array& params, bool fHelp)
 	entry.push_back(Pair("account", my.account));
 	entry.push_back(Pair("address", my.address));
 	entry.push_back(Pair("redeemScript", my.redeemScript));
+	entry.push_back(Pair("addresses", my.addressesJSON));
+	entry.push_back(Pair("nRequired", my.nRequired));
 	return entry;
 }
 
@@ -399,6 +418,8 @@ Value getmultisigaddressesbyaccount(const Array& params, bool fHelp)
 		entry.push_back(Pair("account", setAddress.at(i).account));
 		entry.push_back(Pair("address", setAddress.at(i).address));
 		entry.push_back(Pair("redeemScript", setAddress.at(i).redeemScript));
+		entry.push_back(Pair("addresses", setAddress.at(i).addressesJSON));
+		entry.push_back(Pair("nRequired", setAddress.at(i).nRequired));
 		arr.push_back(entry);
 	}
 	return arr;
@@ -961,6 +982,88 @@ Value createmultisig(const Array& params, bool fHelp)
     result.push_back(Pair("redeemScript", HexStr(inner.begin(), inner.end())));
 
     return result;
+}
+
+Value createmultisigex(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 2 || params.size() > 3)
+    {
+        string msg = "createmultisigex <nrequired> <'[\"key\",\"key\"]'>\n"
+            "Creates a multi-signature address and returns a json object\n"
+            "with keys:\n"
+            "address : bitcrystal address\n"
+            "redeemScript : hex-encoded redemption script";
+        throw runtime_error(msg);
+    }
+	string str;
+	if(params[0].type()!=int_type||params[1].type()!=array_type)
+	{
+		return str;
+	}
+	bool set=false;
+	set=params.size()==3;
+		
+	int nRequired = params[0].get_int();
+	Array arr = params[1].get_array();
+	int size = arr.size();
+	int mine_count=0;
+	for(int i = 0; i < size; i++)
+	{
+		string x = arr[i].get_str();
+		if(!IsValidPubKey(x))
+		{
+			if(IsMineBitcoinAddress(x))
+			{
+				mine_count++;
+			}
+		} else {
+			if(IsMinePubKey(x))
+			{
+				mine_count++;
+			}
+		}
+	}
+	if(nRequired>1 && !set)
+	{
+		if(mine_count>nRequired-1)
+		{
+			return str;
+		}
+	}
+    // Construct using pay-to-script-hash:
+    CScript inner = _createmultisig(params);
+	unsigned char inner_s[sizeof(inner)];
+	memcpy((void*)&inner_s[0],(void*)&inner,sizeof(inner));
+    str = EncodeBase64(inner_s, sizeof(inner));
+    return str;
+}
+
+Value addmultisigex(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() !=2)
+    {
+        string msg = "addmultisigex <nrequired> <'[\"key\",\"key\"]'>\n"
+            "Creates a multi-signature address and returns a json object\n"
+            "with keys:\n"
+            "address : bitcrystal address\n"
+            "redeemScript : hex-encoded redemption script";
+        throw runtime_error(msg);
+    }
+	string x = params[0].get_str();
+	string strAccount = params[1].get_str();
+	bool fDefault=false;
+    vector<unsigned char> ret = DecodeBase64(x.c_str(), &fDefault);
+	int size = ret.size();
+	unsigned char inner_s[size];
+	for(int i = 0; i < size; i++)
+	{
+		inner_s[i] = ret.at(i);
+	}
+	CScript * inner = (CScript*)&inner_s[0];
+	CScriptID innerID = inner->GetID();
+	pwalletMain->AddCScript(*inner);
+	pwalletMain->SetAddressBookName(innerID, strAccount);
+	return CBitcoinAddress(innerID).ToString();
 }
 
 

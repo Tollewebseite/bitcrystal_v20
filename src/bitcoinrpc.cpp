@@ -270,7 +270,21 @@ static const CRPCCommand vRPCCommands[] =
     { "listlockunspent",        &listlockunspent,        false,     false },
 	{ "my_outputrawtransaction",        &my_outputrawtransaction,        false,     false },
 	{ "listtransactions_multisig",        &listtransactions_multisig,        false,     false },
-	{ "listunspent_multisig",        &listunspent_multisig,        false,     false },
+	{ "listunspent_multisig",        &listunspent_multisig,     	false,     false },
+	{ "getpubkey",        &getpubkey,        false,     false },
+	{ "haspubkey",        &haspubkey,        false,     false },
+	{ "getprivkey",        &getprivkey,        false,     false },
+	{ "hasprivkey",        &hasprivkey,        false,     false },
+	{ "ismultisigaddress",        &ismultisigaddress,        false,     false },
+	{ "getbitcoinaddressofpubkey",        &getbitcoinaddressofpubkey,        false,     false },
+	{ "isvalidpubkey",        &isvalidpubkey,        false,     false },
+	{ "isminebitcoinaddress",        &isminebitcoinaddress,        false,     false },
+	{ "isminepubkey",        &isminepubkey,        false,     false },
+	{ "createmultisigex",        &createmultisigex,        false,     false },
+	{ "addmultisigex",        &addmultisigex,        false,     false },
+	{ "createtransaction_multisig",        &createtransaction_multisig,        false,     false },
+	{ "createrawtransaction_multisig",        &createrawtransaction_multisig,        false,     false },
+	{ "decoderawtransaction_multisig",        &decoderawtransaction_multisig,        false,     false },
 };
 
 CRPCTable::CRPCTable()
@@ -1181,6 +1195,14 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     if (strMethod == "addmultisigaddress"     && n > 1) ConvertTo<Array>(params[1]);
     if (strMethod == "createmultisig"         && n > 0) ConvertTo<boost::int64_t>(params[0]);
     if (strMethod == "createmultisig"         && n > 1) ConvertTo<Array>(params[1]);
+	if (strMethod == "addmultisigaddressex"     && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "addmultisigaddressex"     && n > 1) ConvertTo<Array>(params[1]);
+    if (strMethod == "createmultisigex"         && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "createmultisigex"         && n > 1) ConvertTo<Array>(params[1]);
+	if (strMethod == "createtransaction_multisig"         && n > 2) ConvertTo<double>(params[2]);
+	if (strMethod == "createtransaction_multisig"         && n > 3) ConvertTo<double>(params[3]); 
+    if (strMethod == "createrawtransaction_multisig"         && n > 2) ConvertTo<double>(params[2]);
+	if (strMethod == "createrawtransaction_multisig"         && n > 3) ConvertTo<double>(params[3]);  	
     if (strMethod == "listunspent"            && n > 0) ConvertTo<boost::int64_t>(params[0]);
     if (strMethod == "listunspent"            && n > 1) ConvertTo<boost::int64_t>(params[1]);
     if (strMethod == "listunspent"            && n > 2) ConvertTo<Array>(params[2]);

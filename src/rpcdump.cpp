@@ -101,6 +101,298 @@ Value dumpprivkey(const Array& params, bool fHelp)
     return CBitcoinSecret(vchSecret, fCompressed).ToString();
 }
 
+bool GetPrivKey(std::string & address, std::string & privKey)
+{
+	Value ret;
+	Array par;
+	par.push_back(address);
+	bool allok=true;
+	try {
+		ret = dumpprivkey(par, false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return false;
+	} catch (Object ex) {
+		allok=false;
+		return false;
+	}
+	allok=ret.type() == str_type;
+	if(allok)
+	{
+		privKey=ret.get_str();
+	}
+	return allok;
+}
+
+bool hasPrivKey(std::string & address)
+{
+	Value ret;
+	Array par;
+	par.push_back(address);
+	bool allok=true;
+	try {
+		ret = dumpprivkey(par, false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return false;
+	} catch (Object ex) {
+		allok=false;
+		return false;
+	}
+	allok=ret.type() == str_type;
+	return allok;
+}
+
+bool GetPubKey(std::string & address, std::string & pubKey)
+{
+	Value ret;
+	Array par;
+	par.push_back(address);
+	bool allok=true;
+	try {
+		ret = validateaddress(par, false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	allok=ret.type() == obj_type;
+	if(allok)
+	{
+		Object obj = ret.get_obj();
+		ret = find_value(obj, "pubkey");
+		allok = ret.type() == str_type;
+		if(allok)
+		{
+			pubKey=ret.get_str();
+		}
+	}
+	return allok;
+}
+
+bool hasPubKey(std::string & address)
+{
+	Value ret;
+	Array par;
+	par.push_back(address);
+	bool allok=true;
+	try {
+		ret = validateaddress(par, false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	allok=ret.type() == obj_type;
+	if(allok)
+	{
+		Object obj = ret.get_obj();
+		ret = find_value(obj, "pubkey");
+		allok = ret.type() == str_type;
+	}
+	return allok;
+}
+
+bool isMultisigAddress(std::string & address)
+{
+	bool allok=false;
+	allok=hasRedeemScript(address);
+	return allok;
+}
+
+bool GetBitcoinAddressOfPubKey(string & pubKey, string & address)
+{
+	if(IsHex(pubKey))
+	{
+		CPubKey vchPubKey(ParseHex(pubKey));
+        if (!vchPubKey.IsValid())
+		{
+			address="";
+			return false;
+		}
+		
+		address=CBitcoinAddress(vchPubKey.GetID()).ToString();
+		return true;
+	} else {
+		address="";
+		return false;
+	}
+}
+bool IsValidPubKey(string & pubKey)
+{
+	if(IsHex(pubKey))
+	{
+		CPubKey vchPubKey(ParseHex(pubKey));
+        if (!vchPubKey.IsValid())
+		{
+			return false;
+		}
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool IsMineBitcoinAddress(string & address)
+{
+	Value ret;
+	Array par;
+	par.push_back(address);
+	bool allok=false;
+	try {
+		ret = validateaddress(par, false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	allok=ret.type() == obj_type;
+	if(allok)
+	{
+		Object obj = ret.get_obj();
+		ret = find_value(obj, "ismine");
+		allok = ret.type() == bool_type;
+		if(allok)
+		{
+			allok=ret.get_bool();
+		}
+	}
+	return allok;
+}
+
+bool IsMinePubKey(string & pubKey)
+{
+	string address;
+	bool allok = GetBitcoinAddressOfPubKey(pubKey,address);
+	if(allok)
+		allok=IsMineBitcoinAddress(address);
+	return allok;
+}
+
+Value getpubkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "getpubkey\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+	string pubKey;
+	bool allok=GetPubKey(x,pubKey);
+	if(!allok)
+	{
+		pubKey="";
+	}
+    return pubKey;
+}
+
+Value haspubkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "haspubkey\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    return hasPubKey(x);
+}
+
+Value getprivkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "getprivkey\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+	string privKey;
+	bool allok = GetPrivKey(x,privKey);
+	if(!allok)
+	{
+		privKey="";
+	}
+	return privKey;
+}
+
+Value hasprivkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "hasprivkey\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    return hasPrivKey(x);
+}
+
+Value ismultisigaddress(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "ismultisigaddress\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    return isMultisigAddress(x);
+}
+
+Value getbitcoinaddressofpubkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "getbitcoinaddressofpubkey\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+	string address;
+    bool allok = GetBitcoinAddressOfPubKey(x, address);
+	if(!allok)
+		address="";
+	return address;
+}
+
+Value isvalidpubkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "isvalidpubkey\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    bool allok = IsValidPubKey(x);
+	return allok;
+}
+
+Value isminebitcoinaddress(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "isminebitcoinaddress\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    bool allok = IsMineBitcoinAddress(x);
+	return allok;
+}
+
+Value isminepubkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "isminepubkey\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    bool allok = IsMinePubKey(x);
+	return allok;
+}
+
 bool getrawtransactiondetails(std::string & txid, my_rawtransactioninformation & my)
 {
 	Value ret;
@@ -734,7 +1026,7 @@ bool mygetnewaddress(std::string strAccount, std::string & myaddress)
 	return true;
 }
 
-bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, int64 amount, int64 fee, Array & params)
+bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, Array & params)
 {
 	if(fee<=0)
 		fee=0.00001;
@@ -763,8 +1055,8 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 		return false;
 	}
 	Array arr;
-	int64 tAmount=amount+fee;
-	int64 currentAmount = 0;
+	double tAmount=amount+fee;
+	double currentAmount = 0;
 	int size=my_unspenttransactions.size();
 	for(int i = 0; i < size; i++)
 	{
@@ -784,12 +1076,111 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 	}
 	params.push_back(arr);
 	Object obj2;
-	int64 diff=currentAmount-amount+fee;
+	double diff=currentAmount-amount+fee;
 	obj2.push_back(Pair(receive_address,amount));
 	if(diff>0)
 		obj2.push_back(Pair(change_address,diff));
 	params.push_back(obj2);
 }
+
+Value createtransaction_multisig(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() < 4 || params.size() > 4)
+        throw runtime_error("fick die henne\n");
+	string account_or_address=params[0].get_str();
+	string receive_address=params[1].get_str();
+	double amount = params[2].get_real();
+	double fee = params[3].get_real();
+	Array arr;
+	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, arr);
+	if(!allok)
+	{
+		arr.clear();
+	} 
+	return arr;
+}
+
+Value createrawtransaction_multisig(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() < 4 || params.size() > 4)
+        throw runtime_error("fick die henne\n");
+	string account_or_address=params[0].get_str();
+	string receive_address=params[1].get_str();
+	double amount = params[2].get_real();
+	double fee = params[3].get_real();
+	Array arr;
+	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, arr);
+	if(!allok)
+	{
+		arr.clear();
+	} 
+	Value ret;
+	allok=true;
+	try {
+		ret = createrawtransaction(arr,false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	allok=ret.type()==str_type;
+	if(!allok)
+	{
+		return allok;
+	}
+	string x = ret.get_str();
+	Object obj;
+	obj.push_back(Pair("txhash", x));
+	obj.push_back(Pair("signdata", arr[0]));
+	obj.push_back(Pair("fromaddress", account_or_address));
+	return obj;
+}	
+
+Value decoderawtransaction_multisig(const Array& params, bool fHelp)
+{
+	bool allok=false;
+	if (fHelp || params.size() != 1)
+			throw runtime_error("fick die henne\n");
+	try
+	{
+		createrawtransaction_multisig
+		
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	} catch (std::exception ex) {
+		allok=false;
+		return allok;
+	}
+}
+
+string encodeBase64Data(unsigned char * data, size_t & len)
+{
+	unsigned char c[len];
+	memcpy((void*)&c[0],(void*)&data[0],len);
+	return EncodeBase64(c,len);
+}
+
+void decodeBase64Data(string & data, vector<unsigned char> & cpy, size_t & size)
+{
+	bool fDefault=false;
+	cpy = DecodeBase64(data.c_str(), &fDefault);
+	size = (size_t)cpy.size();
+}
+
+void decodeEnding(vector<unsigned char> & cpy, unsigned char * data, size_t & len)
+{
+		for(int i = 0; i < len; i++)
+		{
+			data[i]=cpy.at(i);
+		}
+}
+
 /*Array mygetnewaddress()
 {
 	Array array;
