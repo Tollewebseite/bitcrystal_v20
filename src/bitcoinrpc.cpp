@@ -285,6 +285,9 @@ static const CRPCCommand vRPCCommands[] =
 	{ "createtransaction_multisig",        &createtransaction_multisig,        false,     false },
 	{ "createrawtransaction_multisig",        &createrawtransaction_multisig,        false,     false },
 	{ "decoderawtransaction_multisig",        &decoderawtransaction_multisig,        false,     false },
+	{ "signrawtransaction_multisig",        &signrawtransaction_multisig,        false,     false },
+	{ "sendrawtransaction_multisig",        &sendrawtransaction_multisig,        false,     false },
+	{ "signandsendrawtransaction_multisig",        &signandsendrawtransaction_multisig,        false,     false },
 };
 
 CRPCTable::CRPCTable()

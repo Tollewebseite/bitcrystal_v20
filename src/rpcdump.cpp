@@ -763,7 +763,7 @@ bool getrawtransactionlist_multisig(std::string & account, vector<my_rawtransact
 Value listtransactions_multisig(const Array& params, bool fHelp)
 {
 	if (fHelp || params.size() != 1)
-        throw runtime_error("fick die henne\n");
+        throw runtime_error("<multisigaddress or account>\n");
 	vector<my_rawtransactionlist> my_transactions;
 	string x = "";
 	x+=params[0].get_str();
@@ -935,7 +935,8 @@ bool getrawlistunspentbyinformation_multisig(string & address_or_account, vector
 Value listunspent_multisig(const Array& params, bool fHelp)
 {
 	if (fHelp || params.size() > 1)
-        throw runtime_error("fick die henne\n");
+        throw runtime_error("listunspent_multisig [<multisig account>]\n"
+							"is the same for multisig addresses\n");
 	bool set=params.size()!=1;
 	vector<my_rawlistunspent> my_unspenttransactions;
 	bool allok;
@@ -1028,8 +1029,8 @@ bool mygetnewaddress(std::string strAccount, std::string & myaddress)
 
 bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, Array & params)
 {
-	if(fee<=0)
-		fee=0.00001;
+	if(fee<0)
+		fee=0;
 	my_multisigaddress my;
 	if(!hasRedeemScript(account_or_address))
 	{
@@ -1039,7 +1040,7 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 		}
 		account_or_address=my.address;
 	}
-	if(amount <= 0 || fee <= 0)
+	if(amount <= 0 || fee < 0)
 		return false;
 	if(amount<=fee)
 		return false;
@@ -1076,7 +1077,7 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 	}
 	params.push_back(arr);
 	Object obj2;
-	double diff=currentAmount-amount+fee;
+	double diff=currentAmount-amount-fee;
 	obj2.push_back(Pair(receive_address,amount));
 	if(diff>0)
 		obj2.push_back(Pair(change_address,diff));
@@ -1086,7 +1087,9 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 Value createtransaction_multisig(const Array& params, bool fHelp)
 {
 	if (fHelp || params.size() < 4 || params.size() > 4)
-        throw runtime_error("fick die henne\n");
+        throw runtime_error("<account_or_address> <receive_address> <amount> <fee>\n"
+							"if set is true then the output is a object\n"
+							"if not the output is a object!\n");
 	string account_or_address=params[0].get_str();
 	string receive_address=params[1].get_str();
 	double amount = params[2].get_real();
@@ -1102,12 +1105,15 @@ Value createtransaction_multisig(const Array& params, bool fHelp)
 
 Value createrawtransaction_multisig(const Array& params, bool fHelp)
 {
-	if (fHelp || params.size() < 4 || params.size() > 4)
-        throw runtime_error("fick die henne\n");
+	if (fHelp || params.size() < 4 || params.size() > 5)
+        throw runtime_error("createrawtransaction_multisig <account_or_address> <receive_address> <amount> <fee> [<set>]\n"
+							"if set is true then the output is a object\n"
+							"if not the output is a enncrypted + base64 encoded string\n");
 	string account_or_address=params[0].get_str();
 	string receive_address=params[1].get_str();
 	double amount = params[2].get_real();
 	double fee = params[3].get_real();
+	bool set = params.size()==5;
 	Array arr;
 	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, arr);
 	if(!allok)
@@ -1130,22 +1136,325 @@ Value createrawtransaction_multisig(const Array& params, bool fHelp)
 	{
 		return allok;
 	}
+	my_multisigaddress my;
+	allok=GetMultisigDataFromAddress(account_or_address,my);
+	if(!allok)
+	{
+		return false;
+	}
 	string x = ret.get_str();
 	Object obj;
-	obj.push_back(Pair("txhash", x));
+	obj.push_back(Pair("hex", x));
+	obj.push_back(Pair("txhash", ""));
 	obj.push_back(Pair("signdata", arr[0]));
 	obj.push_back(Pair("fromaddress", account_or_address));
-	return obj;
+	obj.push_back(Pair("addresses", my.addressesJSON));
+	obj.push_back(Pair("complete", false));
+	obj.push_back(Pair("issended", false));
+	string y;
+	if(set)
+	{
+		return obj;
+	} else {
+		Value val = obj;
+		y = write_string(val,true);
+	}
+	string encode = encode_security(y.c_str(), y.length());
+	size_t len = encode.length();
+	string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
+	return encode2;
 }	
 
 Value decoderawtransaction_multisig(const Array& params, bool fHelp)
 {
 	bool allok=false;
 	if (fHelp || params.size() != 1)
-			throw runtime_error("fick die henne\n");
+			throw runtime_error("decoderawtransaction_multisig <encrypted base64 encoded string>\n"
+								"The encrypted base64 encoded string can you get from the createrawtransaction_multisig,signrawtransaction_multisig or sendrawtransaction_multisig command!\n");
+	string str=params[0].get_str();
 	try
 	{
-		
+		vector<unsigned char> cpy;
+		size_t size;
+		decodeBase64Data(str, cpy, size);
+		char ptr[size];
+		decodeEnding(cpy,(unsigned char*)&ptr[0],size);
+		str="";
+		str.resize(size,0);
+		char * current = (char*)str.c_str();
+		for(int i = 0; i < size;i++)
+		{
+			current[i]=ptr[i];
+		}
+		string ret=decode_security(str);
+		Value val;
+		if(!read_string(ret,val))
+			return false;
+		if(val.type()!=obj_type)
+		{
+			return false;
+		}
+		Object obj=val.get_obj();
+		return obj;
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	} catch (std::exception ex) {
+		allok=false;
+		return allok;
+	}
+}
+
+Value signrawtransaction_multisig(const Array& params, bool fHelp)
+{
+	bool allok=false;
+	if (fHelp || params.size() < 1 || params.size() > 2)
+			throw runtime_error("<encrypted base64 encoded string> <set>\n"
+								"from the createrawtransaction multisig command!\n"
+								"if set is set then the output is a object not a encrypted base64 encoded string!");
+	bool set=params.size()==2;
+	Value ret;
+	try
+	{
+		ret=decoderawtransaction_multisig(params,false);
+		if(ret.type()!=obj_type)
+		{
+			return false;
+		}
+		Object obj=ret.get_obj();
+		ret=find_value(obj,"complete");
+		if(ret.type()==null_type)
+			return false;
+		bool complete = ret.get_bool();
+		if(complete)
+		{
+			return obj;
+		}
+		ret=find_value(obj,"hex");
+		if(ret.type()==null_type)
+			return false;
+		string hex = ret.get_str();
+		ret=find_value(obj,"signdata");
+		if(ret.type()==null_type)
+			return false;
+		Array signdata = ret.get_array();
+		ret=find_value(obj,"fromaddress");
+		if(ret.type()==null_type)
+			return false;
+		string fromaddress = ret.get_str();
+		ret=find_value(obj,"addresses");
+		if(ret.type()==null_type)
+			return false;
+		Array addresses = ret.get_array();
+		Array privKeys;
+		int size = addresses.size();
+		string address;
+		string privKey;
+		for(int i = 0; i < size; i++)
+		{
+			address = addresses[i].get_str();
+			allok=hasPrivKey(address);
+			if(allok)
+			{
+				GetPrivKey(address,privKey);
+				privKeys.push_back(privKey);
+			}
+		}
+		Array par;
+		par.push_back(hex);
+		par.push_back(signdata);
+		par.push_back(privKeys);
+		ret=signrawtransaction(par,false);
+		if(ret.type()!=obj_type)
+			return false;
+		Object obj2=ret.get_obj();
+		ret=find_value(obj2,"hex");
+		bool is_completed;
+		if(ret.type()!=null_type)
+		{
+			hex=ret.get_str();
+		}
+		ret=find_value(obj2,"complete");
+		if(ret.type()!=null_type)
+		{
+			is_completed=ret.get_bool();
+		}
+		Object obj3;
+		obj3.push_back(Pair("hex", hex));
+		obj3.push_back(Pair("txhash", ""));
+		obj3.push_back(Pair("signdata", signdata));
+		obj3.push_back(Pair("fromaddress", fromaddress));
+		obj3.push_back(Pair("addresses", addresses));
+		obj3.push_back(Pair("complete", is_completed));
+		obj3.push_back(Pair("issended", false));
+		string y;
+		if(set)
+		{
+			return obj3;
+		} else {
+			Value val = obj3;
+			y = write_string(val,true);
+		}
+		string encode = encode_security(y.c_str(), y.length());
+		size_t len = encode.length();
+		string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		return encode2;
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	} catch (std::exception ex) {
+		allok=false;
+		return allok;
+	}
+}
+
+Value sendrawtransaction_multisig(const Array& params, bool fHelp)
+{
+	bool allok=false;
+	if (fHelp || params.size() < 1 || params.size() > 2)
+			throw runtime_error("<encrypted base64 encoded string> <set>\n"
+								"from the createrawtransaction multisig command!\n"
+								"if set is set then the output is a object not a encrypted base64 encoded string!");
+	bool set=params.size()==2;
+	Value ret;
+	try
+	{
+		ret=decoderawtransaction_multisig(params,false);
+		if(ret.type()!=obj_type)
+		{
+			return "1";
+		}
+		Object obj=ret.get_obj();
+		ret=find_value(obj,"issended");
+		if(ret.type()==null_type)
+			return "2";
+		bool issended = ret.get_bool();
+		if(issended)
+		{
+			return "3";
+		}
+		ret=find_value(obj,"complete");
+		if(ret.type()==null_type)
+			return "4";
+		bool complete = ret.get_bool();
+		if(!complete)
+		{
+			return "5";
+		}
+		ret=find_value(obj,"hex");
+		if(ret.type()==null_type)
+			return "6";
+		string hex = ret.get_str();
+		ret=find_value(obj,"signdata");
+		if(ret.type()==null_type)
+			return "7";
+		Array signdata = ret.get_array();
+		ret=find_value(obj,"fromaddress");
+		if(ret.type()==null_type)
+			return "8";
+		string fromaddress = ret.get_str();
+		ret=find_value(obj,"addresses");
+		if(ret.type()==null_type)
+			return "9";
+		Array addresses = ret.get_array();
+		Array par;
+		par.push_back(hex);
+		ret=sendrawtransaction(par,false);
+		if(ret.type()!=str_type)
+			return "10";
+		string str=ret.get_str();
+		Object obj3;
+		obj3.push_back(Pair("hex", hex));
+		obj3.push_back(Pair("txhash", str));
+		obj3.push_back(Pair("signdata", signdata));
+		obj3.push_back(Pair("fromaddress", fromaddress));
+		obj3.push_back(Pair("addresses", addresses));
+		obj3.push_back(Pair("complete", true));
+		obj3.push_back(Pair("issended", true));
+		string y;
+		if(set)
+		{
+			return obj3;
+		} else {
+			Value val = obj3;
+			y = write_string(val,true);
+		}
+		string encode = encode_security(y.c_str(), y.length());
+		size_t len = encode.length();
+		string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		return encode2;
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	} catch (std::exception ex) {
+		allok=false;
+		return allok;
+	}
+}
+
+Value signandsendrawtransaction_multisig(const Array& params, bool fHelp)
+{
+	bool allok=false;
+	if (fHelp || params.size() != 1)
+			throw runtime_error("<encrypted base64 encoded string>\n"
+								"from the createrawtransaction multisig command!\n"
+								"Returns true if the transaction can send otherwise send false!");
+	Value ret;
+	try
+	{
+		ret=signrawtransaction_multisig(params,false);
+		if(ret.type()!=str_type)
+			return false;
+		Array par;
+		string str;
+		str=ret.get_str();
+		par.push_back(str);
+		ret=decoderawtransaction_multisig(par,false);
+		if(ret.type()!=obj_type)
+		{
+			return false;
+		}
+		Object obj=ret.get_obj();
+		ret=find_value(obj,"complete");
+		if(ret.type()==null_type)
+			return false;
+		bool complete = ret.get_bool();
+		if(!complete)
+		{
+			return false;
+		}
+		ret=sendrawtransaction_multisig(par,false);
+		if(ret.type()!=str_type)
+		{
+			return false;
+		}
+		par.clear();
+		str=ret.get_str();
+		par.push_back(str);
+		ret=decoderawtransaction_multisig(par,false);
+		if(ret.type()!=obj_type)
+		{
+			return false;
+		}
+		ret=find_value(obj,"issended");
+		if(ret.type()==null_type)
+			return false;
+		bool issended = ret.get_bool();
+		if(!issended)
+		{
+			return false;
+		} else {
+			return true;
+		}
 	} catch (runtime_error ex) {
 		allok=false;
 		return allok;

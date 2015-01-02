@@ -238,7 +238,7 @@ Value getmultisigaddresses(const Array& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getmultisigaddresses <bool>\n"
-            "Returns the list of addresses.");
+            "Returns the list of multisig addresses.");
 
 	bool set=params.size()==1;
 	vector<my_multisigaddress> setAddress;
@@ -265,7 +265,6 @@ Value getmultisigaddresses(const Array& params, bool fHelp)
 
 bool GetMultisigAccountAddresses(string & strAccount, vector<my_multisigaddress>& setAddress)
 {
-	vector<string> names;
 	vector<my_multisigaddress> setAddresses;
 	Array arr2;
 	bool allok=GetMultisigAddresses(setAddresses);
@@ -278,6 +277,32 @@ bool GetMultisigAccountAddresses(string & strAccount, vector<my_multisigaddress>
 			setAddress.push_back(setAddresses.at(i));
 	}
 	allok=setAddress.size()!=0;
+	return allok;
+}
+
+bool GetMultisigDataFromAddress(std::string & address, my_multisigaddress & my)
+{
+	vector<my_multisigaddress> setAddresses;
+	Array arr2;
+	bool allok=GetMultisigAddresses(setAddresses);
+	if(!allok)
+		return allok;
+    int size = setAddresses.size();
+	for(int i = 0; i < size; i++)
+	{
+		if(setAddresses.at(i).address.compare(address)==0)
+		{
+			my.clear();
+			my.account=setAddresses.at(i).account;
+			my.address=setAddresses.at(i).address;
+			my.redeemScript=setAddresses.at(i).redeemScript;
+			my.addressesJSON=setAddresses.at(i).addressesJSON;
+			my.nRequired=setAddresses.at(i).nRequired;
+			my.empty=false;
+			return true;
+		}
+	}
+	allok=setAddresses.size()!=0;
 	return allok;
 }
 
@@ -295,6 +320,7 @@ bool GetMultisigAccountAddress(string & strAccount, my_multisigaddress & my)
 	my.redeemScript=setAddress.at(0).redeemScript;
 	my.addressesJSON=setAddress.at(0).addressesJSON;
 	my.nRequired=setAddress.at(0).nRequired;
+	my.empty=false;
 	return true;
 }
 
@@ -988,11 +1014,11 @@ Value createmultisigex(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 3)
     {
-        string msg = "createmultisigex <nrequired> <'[\"key\",\"key\"]'>\n"
-            "Creates a multi-signature address and returns a json object\n"
-            "with keys:\n"
-            "address : bitcrystal address\n"
-            "redeemScript : hex-encoded redemption script";
+        string msg = "createmultisigex <nrequired> <'[\"key\",\"key\"]'> <set>\n";
+        msg+=   "Creates a multi-signature address and returns a base64 encoded string\n";
+		msg+=	"You can add the multisigaddress to the wallet with addmultisigex <base64encodedstring>\n";
+		msg+=	"If set is true or any value then you have the permission that all pubkeys can owned from your wallet!\n";
+		msg+=	"If set is not set then you need at least 1 public key of another wallet!\n";
         throw runtime_error(msg);
     }
 	string str;
@@ -1040,13 +1066,10 @@ Value createmultisigex(const Array& params, bool fHelp)
 
 Value addmultisigex(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() !=2)
+    if (fHelp || params.size() !=1)
     {
-        string msg = "addmultisigex <nrequired> <'[\"key\",\"key\"]'>\n"
-            "Creates a multi-signature address and returns a json object\n"
-            "with keys:\n"
-            "address : bitcrystal address\n"
-            "redeemScript : hex-encoded redemption script";
+        string msg = "addmultisigex <base64encodedstring>\n";
+				msg+= "The first value can you get from the createmultisigex command!";
         throw runtime_error(msg);
     }
 	string x = params[0].get_str();

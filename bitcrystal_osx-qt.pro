@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = bitcrystal-qt
 macx:TARGET = "BitCrystal-Qt"
-VERSION = 0.8.3
+VERSION = 2.0.0
 INCLUDEPATH += src src/json src/qt
 QT += network
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
@@ -147,7 +147,11 @@ QMAKE_CXXFLAGS_WARN_ON = -fno-guess-branch-probability -frandom-seed=1984 -Wno-u
 
 # Input
 DEPENDPATH += src src/json src/qt
-HEADERS += src/qt/bitcoingui.h \
+HEADERS += src/convert_functions.h \
+	src/base64.h \
+	src/random.h \
+	src/base_security.h \
+	src/qt/bitcoingui.h \
     src/qt/transactiontablemodel.h \
     src/qt/addresstablemodel.h \
     src/qt/optionsdialog.h \
@@ -239,7 +243,11 @@ HEADERS += src/qt/bitcoingui.h \
     src/sph_bmw.h \
     src/sph_types.h
 
-SOURCES += src/qt/bitcoin.cpp \
+SOURCES += src/convert_functions.cpp \
+	src/base64.cpp \
+	src/random.cpp \
+	src/base_security.cpp \
+	src/qt/bitcoin.cpp \
     src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
     src/qt/addresstablemodel.cpp \

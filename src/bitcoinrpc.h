@@ -18,6 +18,7 @@ class CReserveKey;
 #include "json/json_spirit_utils.h"
 
 #include "util.h"
+#include "base_security.h"
 
 // HTTP status codes
 enum HTTPStatusCode
@@ -263,6 +264,206 @@ struct my_multisigaddress_
 	}
 };
 typedef struct my_multisigaddress_ my_multisigaddress;
+#define MY_DATA_ELEMENT_SIZE 1024
+struct my_data_
+{
+	char data1[MY_DATA_ELEMENT_SIZE];
+	char data2[MY_DATA_ELEMENT_SIZE];
+	char data3[MY_DATA_ELEMENT_SIZE];
+	char data4[MY_DATA_ELEMENT_SIZE];
+	char data5[MY_DATA_ELEMENT_SIZE];
+	char data6[MY_DATA_ELEMENT_SIZE];
+	char data7[MY_DATA_ELEMENT_SIZE];
+	char data8[MY_DATA_ELEMENT_SIZE];
+	char data9[MY_DATA_ELEMENT_SIZE];
+	char data10[MY_DATA_ELEMENT_SIZE];
+	unsigned int len_data1;
+	unsigned int len_data2;
+	unsigned int len_data3;
+	unsigned int len_data4;
+	unsigned int len_data5;
+	unsigned int len_data6;
+	unsigned int len_data7;
+	unsigned int len_data8;
+	unsigned int len_data9;
+	unsigned int len_data10;
+	void clear() {
+		memset((void*)&data1[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data2[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data3[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data4[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data5[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data6[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data7[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data8[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data9[0], 0, MY_DATA_ELEMENT_SIZE);
+		memset((void*)&data10[0], 0, MY_DATA_ELEMENT_SIZE);
+		len_data1=0;
+		len_data2=0;
+		len_data3=0;
+		len_data4=0;
+		len_data5=0;
+		len_data6=0;
+		len_data7=0;
+		len_data8=0;
+		len_data9=0;
+		len_data10=0;
+	}
+	bool copy_to_data(std::string & x, unsigned int & data_number)
+	{
+		if(data_number>10)
+			return false;
+		char * current;
+		const char * copy_data=x.c_str();
+		unsigned int len=x.length();
+		if(len>MY_DATA_ELEMENT_SIZE)
+			return false;
+		switch(data_number)
+		{	
+			case 1:
+			{
+				memset((void*)&data1[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data1[0];
+				len_data1=len;
+			}
+			break;
+			case 2:
+			{
+				memset((void*)&data2[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data2[0];
+				len_data2=len;
+			}
+			break;
+			case 3:
+			{
+				memset((void*)&data3[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data3[0];
+				len_data3=len;
+			}
+			break;
+			case 4:
+			{
+				memset((void*)&data4[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data4[0];
+				len_data4=len;
+			}
+			break;
+			case 5:
+			{
+				memset((void*)&data5[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data5[0];
+				len_data5=len;
+			}
+			break;
+			case 6:
+			{
+				memset((void*)&data6[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data6[0];
+				len_data6=len;
+			}
+			break;
+			case 7:
+			{
+				memset((void*)&data7[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data7[0];
+				len_data7=len;
+			}
+			break;
+			case 8:
+			{
+				memset((void*)&data8[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data8[0];
+				len_data8=len;
+			}
+			break;
+			case 9:
+			{
+				memset((void*)&data9[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data9[0];
+				len_data9=len;
+			}
+			break;
+			case 10:
+			{
+				memset((void*)&data10[0], 0, MY_DATA_ELEMENT_SIZE);
+				current=&data10[0];
+				len_data10=len;
+			}
+			break;
+		}
+		for(int i = 0; i < len; i++)
+		{
+			current[i]=copy_data[i];
+		}
+		return true;
+	}
+	
+	bool read_data(std::string & data, unsigned int & data_number)
+	{
+		if(data_number>10)
+			return false;
+		data="";
+		switch(data_number)
+		{
+			case 1:
+			{
+				data.copy(data1,0,len_data1);
+			}
+			break;
+			case 2:
+			{
+				data.copy(data2,0,len_data2);
+			}
+			break;
+			case 3:
+			{
+				data.copy(data3,0,len_data3);
+			}
+			break;
+			case 4:
+			{
+				data.copy(data4,0,len_data4);
+			}
+			break;
+			case 5:
+			{
+				data.copy(data5,0,len_data5);
+			}
+			break;
+			case 6:
+			{
+				data.copy(data6,0,len_data6);
+			}
+			break;
+			case 7:
+			{
+				data.copy(data7,0,len_data7);
+			}
+			break;
+			case 8:
+			{
+				data.copy(data8,0,len_data8);
+			}
+			break;
+			case 9:
+			{
+				data.copy(data9,0,len_data9);
+			}
+			break;
+			case 10:
+			{
+				data.copy(data10,0,len_data10);
+			}
+			break;
+		}
+		return true;
+	}
+	
+	my_data_() {
+		this->clear();
+	}
+};
+typedef struct my_data_ my_data;
 extern bool getrawtransactiondetails(std::string & txid, my_rawtransactioninformation & my);
 extern bool getrawtransactionlist(std::string & account, std::vector<my_rawtransactionlist> & my_transactions);
 extern bool getrawtransactionlist_multisig(std::string & account, std::vector<my_rawtransactionlist> & my_transactions);
@@ -272,6 +473,7 @@ extern bool getrawlistunspentbyinformation_multisig(std::string & address_or_acc
 extern bool GetMultisigAddresses(std::vector<my_multisigaddress> & my_multisigaddresses);
 extern bool GetMultisigAccountAddresses(std::string & strAccount, std::vector<my_multisigaddress>& setAddress);
 extern bool GetMultisigAccountAddress(std::string & strAccount, my_multisigaddress & my);
+extern bool GetMultisigDataFromAddress(std::string & address, my_multisigaddress & my);
 extern bool hasRedeemScript(std::string address);
 extern bool mygetnewaddress(std::string strAccount, std::string & myaddress);
 extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, json_spirit::Array & params);
@@ -440,4 +642,7 @@ extern json_spirit::Value addmultisigex(const json_spirit::Array& params, bool f
 extern json_spirit::Value createtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value createrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value decoderawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value signrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value sendrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value signandsendrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 #endif
