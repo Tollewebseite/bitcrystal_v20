@@ -1145,7 +1145,6 @@ Value decoderawtransaction_multisig(const Array& params, bool fHelp)
 			throw runtime_error("fick die henne\n");
 	try
 	{
-		createrawtransaction_multisig
 		
 	} catch (runtime_error ex) {
 		allok=false;
