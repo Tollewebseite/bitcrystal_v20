@@ -235,12 +235,11 @@ bool GetMultisigAddresses(vector<my_multisigaddress> & my_multisigaddresses)
 
 Value getmultisigaddresses(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() > 0)
         throw runtime_error(
-            "getmultisigaddresses <bool>\n"
+            "getmultisigaddresses\n"
             "Returns the list of multisig addresses.");
 
-	bool set=params.size()==1;
 	vector<my_multisigaddress> setAddress;
     Array arr;
 	bool allok = GetMultisigAddresses(setAddress);
@@ -1066,14 +1065,17 @@ Value createmultisigex(const Array& params, bool fHelp)
 
 Value addmultisigaddressex(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() !=1)
+    if (fHelp || params.size() < 1 || params.size() > 2)
     {
-        string msg = "addmultisigaddressex <base64encodedstring>\n";
-				msg+= "The first value can you get from the createmultisigex command!";
+        string msg = "addmultisigaddressex <base64encodedstring> [<strAccount>]\n";
+				msg+= "The first value can you get from the createmultisigex command!\n";
+				msg+= "The second argument is an optional parameter and is the new account name for the multisig address!";
         throw runtime_error(msg);
     }
 	string x = params[0].get_str();
-	string strAccount = params[1].get_str();
+	string strAccount = "";
+	if(params.size()==2)
+		strAccount=params[1].get_str();
 	bool fDefault=false;
     vector<unsigned char> ret = DecodeBase64(x.c_str(), &fDefault);
 	int size = ret.size();
