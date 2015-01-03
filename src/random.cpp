@@ -5,7 +5,7 @@ namespace myrand
 	{
 		if(seed==0)
 		{
-			srand(1419250578);
+			srand(1420297560);
 		} else if (seed < 0) {
 			srand(time(NULL));
 		} else {
