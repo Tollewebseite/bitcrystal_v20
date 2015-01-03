@@ -1211,11 +1211,25 @@ Value decoderawtransaction_multisig(const Array& params, bool fHelp)
 Value signrawtransaction_multisig(const Array& params, bool fHelp)
 {
 	bool allok=false;
-	if (fHelp || params.size() < 1 || params.size() > 2)
-			throw runtime_error("<encrypted base64 encoded string> <set>\n"
+	if (fHelp || params.size() < 1 || params.size() > 3)
+			throw runtime_error("signrawtransaction_multisig <encrypted base64 encoded string> [<amount>] [<set>]\n"
 								"from the createrawtransaction multisig command!\n"
+								"if amount is set and is a unsigned integer then signed only with a specified amount of private keys!\n"
 								"if set is set then the output is a object not a encrypted base64 encoded string!");
-	bool set=params.size()==2;
+	unsigned int amount=0;
+	if(params.size()>=2)
+	{
+		Value val1=params[1];
+		if(val1.type()==int_type)
+		{
+			amount=val1.get_int();
+		}
+	}
+	if(amount<0)
+	{
+		amount=0;
+	}
+	bool set=params.size()==3;
 	Value ret;
 	try
 	{
@@ -1251,6 +1265,10 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 		Array addresses = ret.get_array();
 		Array privKeys;
 		int size = addresses.size();
+		if(amount < size && amount > 0)
+		{
+			size=amount;
+		}
 		string address;
 		string privKey;
 		for(int i = 0; i < size; i++)

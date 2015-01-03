@@ -3,7 +3,7 @@
 // Copyright (c) 2013 The Sifcoin developers
 // Copyright (c) 2013 The Quarkcoin developers
 // Copyright (c) 2013-2014 The BitQuark Developers
-// Copyright (c) 2014 The BitCrystal Developers
+// Copyright (c) 2014-2015 The BitCrystal Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
