@@ -753,7 +753,7 @@ bool getrawtransactiondetails(std::string & txid, my_rawtransactioninformation &
 Value my_outputrawtransaction(const Array& params, bool fHelp)
 {
 	if (fHelp || params.size() != 1)
-        throw runtime_error("fick die henne\n");
+        throw runtime_error("my_outputrawtransaction <txid>\n");
 	my_rawtransactioninformation my;
 	string x = "";
 	x+=params[0].get_str();

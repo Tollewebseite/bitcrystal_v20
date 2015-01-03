@@ -1016,7 +1016,7 @@ Value createmultisigex(const Array& params, bool fHelp)
     {
         string msg = "createmultisigex <nrequired> <'[\"key\",\"key\"]'> <set>\n";
         msg+=   "Creates a multi-signature address and returns a base64 encoded string\n";
-		msg+=	"You can add the multisigaddress to the wallet with addmultisigex <base64encodedstring>\n";
+		msg+=	"You can add the multisigaddress to the wallet with addmultisigaddressex <base64encodedstring>\n";
 		msg+=	"If set is true or any value then you have the permission that all pubkeys can owned from your wallet!\n";
 		msg+=	"If set is not set then you need at least 1 public key of another wallet!\n";
         throw runtime_error(msg);
@@ -1064,11 +1064,11 @@ Value createmultisigex(const Array& params, bool fHelp)
     return str;
 }
 
-Value addmultisigex(const Array& params, bool fHelp)
+Value addmultisigaddressex(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() !=1)
     {
-        string msg = "addmultisigex <base64encodedstring>\n";
+        string msg = "addmultisigaddressex <base64encodedstring>\n";
 				msg+= "The first value can you get from the createmultisigex command!";
         throw runtime_error(msg);
     }
