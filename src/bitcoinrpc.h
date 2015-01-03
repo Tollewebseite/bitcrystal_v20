@@ -168,7 +168,7 @@ struct my_rawtransactioninformation_
 		blocktime=0;
 		empty=true;
 	}
-	my_transactioninformation_() {
+	my_rawtransactioninformation_() {
 		this->clear();
 	}
 };
@@ -203,7 +203,7 @@ struct my_rawtransactionlist_
 		timereceived=0;
 		empty=true;
 	}
-	my_transactionlist_() {
+	my_rawtransactionlist_() {
 		this->clear();
 	}
 };
