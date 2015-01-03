@@ -279,7 +279,7 @@ Value getpubkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "getpubkey\n"
+            "getpubkey <bitcoinaddress>\n"
             "Returns true or false.");
 
 	string x = params[0].get_str();
@@ -296,7 +296,8 @@ Value haspubkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "haspubkey\n"
+            "haspubkey <bitcoinaddress>\n"
+			"The pubkey can you get from the getpubkey command!\n"
             "Returns true or false.");
 
 	string x = params[0].get_str();
@@ -307,7 +308,7 @@ Value getprivkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "getprivkey\n"
+            "getprivkey <bitcoinaddress>\n"
             "Returns true or false.");
 
 	string x = params[0].get_str();
@@ -324,7 +325,8 @@ Value hasprivkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "hasprivkey\n"
+            "hasprivkey <bitcoinaddress>\n"
+			"The privkey can you get from the getprivkey command!\n"
             "Returns true or false.");
 
 	string x = params[0].get_str();
@@ -335,7 +337,8 @@ Value ismultisigaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "ismultisigaddress\n"
+            "ismultisigaddress <multisigaddress>\n"
+			"The multisigaddresses can you get for example from the getmultisigaddresses command!\n"
             "Returns true or false.");
 
 	string x = params[0].get_str();
@@ -346,8 +349,9 @@ Value getbitcoinaddressofpubkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "getbitcoinaddressofpubkey\n"
-            "Returns true or false.");
+            "getbitcoinaddressofpubkey <pubkey>\n"
+			"The pubkey can you get from the getpubkey command!\n"
+            "Returns the bitcoin address.");
 
 	string x = params[0].get_str();
 	string address;
@@ -361,7 +365,8 @@ Value isvalidpubkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "isvalidpubkey\n"
+            "isvalidpubkey <pubkey>\n"
+			"The pubkey can you get from the getpubkey command!\n"
             "Returns true or false.");
 
 	string x = params[0].get_str();
@@ -373,7 +378,7 @@ Value isminebitcoinaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "isminebitcoinaddress\n"
+            "isminebitcoinaddress <bitcoinaddress>\n"
             "Returns true or false.");
 
 	string x = params[0].get_str();
@@ -385,7 +390,8 @@ Value isminepubkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "isminepubkey\n"
+            "isminepubkey <pubkey>\n"
+			"The pubkey can you get from the getpubkey command!\n"
             "Returns true or false.");
 
 	string x = params[0].get_str();
@@ -763,7 +769,7 @@ bool getrawtransactionlist_multisig(std::string & account, vector<my_rawtransact
 Value listtransactions_multisig(const Array& params, bool fHelp)
 {
 	if (fHelp || params.size() != 1)
-        throw runtime_error("<multisigaddress or account>\n");
+        throw runtime_error("listtransactions_multisig <multisigaddress or account>\n");
 	vector<my_rawtransactionlist> my_transactions;
 	string x = "";
 	x+=params[0].get_str();
@@ -1087,9 +1093,8 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 Value createtransaction_multisig(const Array& params, bool fHelp)
 {
 	if (fHelp || params.size() < 4 || params.size() > 4)
-        throw runtime_error("<account_or_address> <receive_address> <amount> <fee>\n"
-							"if set is true then the output is a object\n"
-							"if not the output is a object!\n");
+        throw runtime_error("createtransaction_multisig <account_or_address> <receive_address> <amount> <fee>\n"
+							"Returns a json array!\n");
 	string account_or_address=params[0].get_str();
 	string receive_address=params[1].get_str();
 	double amount = params[2].get_real();
@@ -1213,16 +1218,17 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 	bool allok=false;
 	if (fHelp || params.size() < 1 || params.size() > 3)
 			throw runtime_error("signrawtransaction_multisig <encrypted base64 encoded string> [<amount>] [<set>]\n"
-								"from the createrawtransaction multisig command!\n"
-								"if amount is set and is a unsigned integer then signed only with a specified amount of private keys!\n"
+								"The encrypted base64 encoded string can you get from the createrawtransaction_multisig command!\n"
+								"If the amount is set, the amount is greater than 0 and less than\n"
+								"nRequired (type getmultisigaddresses in the console for more information), then\n"
+								"only a certain amount of private keys will be used to sign the transaction.\n"
 								"if set is set then the output is a object not a encrypted base64 encoded string!");
 	unsigned int amount=0;
 	if(params.size()>=2)
 	{
-		Value val1=params[1];
-		if(val1.type()==int_type)
+		if(params[1].type()==int_type)
 		{
-			amount=val1.get_int();
+			amount=params[1].get_int();
 		}
 	}
 	if(amount<0)
@@ -1231,9 +1237,12 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 	}
 	bool set=params.size()==3;
 	Value ret;
+	string z=params[0].get_str();
+	Array par2;
+	par2.push_back(z);
 	try
 	{
-		ret=decoderawtransaction_multisig(params,false);
+		ret=decoderawtransaction_multisig(par2,false);
 		if(ret.type()!=obj_type)
 		{
 			return false;
@@ -1265,20 +1274,36 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 		Array addresses = ret.get_array();
 		Array privKeys;
 		int size = addresses.size();
-		if(amount < size && amount > 0)
-		{
-			size=amount;
-		}
 		string address;
 		string privKey;
-		for(int i = 0; i < size; i++)
+		if(amount < size && amount > 0)
 		{
-			address = addresses[i].get_str();
-			allok=hasPrivKey(address);
-			if(allok)
+			int isSetted=0;
+			for(int i = 0; i < size; i++)
 			{
-				GetPrivKey(address,privKey);
-				privKeys.push_back(privKey);
+				address = addresses[i].get_str();
+				allok=hasPrivKey(address);
+				if(allok)
+				{
+					GetPrivKey(address,privKey);
+					privKeys.push_back(privKey);
+					isSetted++;
+				}
+				if(isSetted>=amount)
+				{
+					break;
+				}
+			}
+		} else {
+			for(int i = 0; i < size; i++)
+			{
+				address = addresses[i].get_str();
+				allok=hasPrivKey(address);
+				if(allok)
+				{
+					GetPrivKey(address,privKey);
+					privKeys.push_back(privKey);
+				}
 			}
 		}
 		Array par;
@@ -1336,56 +1361,59 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 {
 	bool allok=false;
 	if (fHelp || params.size() < 1 || params.size() > 2)
-			throw runtime_error("<encrypted base64 encoded string> <set>\n"
-								"from the createrawtransaction multisig command!\n"
+			throw runtime_error("sendrawtransaction_multisig <encrypted base64 encoded string> <set>\n"
+								"The encrypted base64 encoded string can you get from the signrawtransaction multisig command!\n"
 								"if set is set then the output is a object not a encrypted base64 encoded string!");
 	bool set=params.size()==2;
+	string z=params[0].get_str();
+	Array par2;
+	par2.push_back(z);
 	Value ret;
 	try
 	{
-		ret=decoderawtransaction_multisig(params,false);
+		ret=decoderawtransaction_multisig(par2,false);
 		if(ret.type()!=obj_type)
 		{
-			return "1";
+			return false;
 		}
 		Object obj=ret.get_obj();
 		ret=find_value(obj,"issended");
 		if(ret.type()==null_type)
-			return "2";
+			return false;
 		bool issended = ret.get_bool();
 		if(issended)
 		{
-			return "3";
+			return false;
 		}
 		ret=find_value(obj,"complete");
 		if(ret.type()==null_type)
-			return "4";
+			return false;
 		bool complete = ret.get_bool();
 		if(!complete)
 		{
-			return "5";
+			return false;
 		}
 		ret=find_value(obj,"hex");
 		if(ret.type()==null_type)
-			return "6";
+			return false;
 		string hex = ret.get_str();
 		ret=find_value(obj,"signdata");
 		if(ret.type()==null_type)
-			return "7";
+			return false;
 		Array signdata = ret.get_array();
 		ret=find_value(obj,"fromaddress");
 		if(ret.type()==null_type)
-			return "8";
+			return false;
 		string fromaddress = ret.get_str();
 		ret=find_value(obj,"addresses");
 		if(ret.type()==null_type)
-			return "9";
+			return false;
 		Array addresses = ret.get_array();
 		Array par;
 		par.push_back(hex);
 		ret=sendrawtransaction(par,false);
 		if(ret.type()!=str_type)
-			return "10";
+			return false;
 		string str=ret.get_str();
 		Object obj3;
 		obj3.push_back(Pair("hex", hex));
@@ -1423,8 +1451,8 @@ Value signandsendrawtransaction_multisig(const Array& params, bool fHelp)
 {
 	bool allok=false;
 	if (fHelp || params.size() != 1)
-			throw runtime_error("<encrypted base64 encoded string>\n"
-								"from the createrawtransaction multisig command!\n"
+			throw runtime_error("signandsendrawtransaction_multisig <encrypted base64 encoded string>\n"
+								"The encrypted base64 encoded string can you get from the createrawtransaction multisig command!\n"
 								"Returns true if the transaction can send otherwise send false!");
 	Value ret;
 	try
@@ -1463,6 +1491,7 @@ Value signandsendrawtransaction_multisig(const Array& params, bool fHelp)
 		{
 			return false;
 		}
+		obj=ret.get_obj();
 		ret=find_value(obj,"issended");
 		if(ret.type()==null_type)
 			return false;
