@@ -222,6 +222,39 @@ bool GetBitcoinAddressOfPubKey(string & pubKey, string & address)
 		return false;
 	}
 }
+
+bool GetPubKeyOfPrivKey(string & privKey, string & pubKey)
+{
+	CBitcoinSecret vchSecret;
+    bool fGood = vchSecret.SetString(privKey);
+    if (!fGood) {
+		pubKey="";
+		return false;
+	}
+    CKey key;
+    bool fCompressed;
+    CSecret secret = vchSecret.GetSecret(fCompressed);
+    key.SetSecret(secret, fCompressed);
+	pubKey=HexStr(key.GetPubKey().Raw());
+	return true;
+}
+
+bool GetBitcoinAddressOfPrivKey(string & privKey, string & address)
+{
+	CBitcoinSecret vchSecret;
+    bool fGood = vchSecret.SetString(privKey);
+
+    if (!fGood) {
+		address="";
+		return false;
+	}
+    CKey key;
+    bool fCompressed;
+    CSecret secret = vchSecret.GetSecret(fCompressed);
+    key.SetSecret(secret, fCompressed);
+	address=CBitcoinAddress(key.GetPubKey().GetID()).ToString();
+	return true;
+}
 bool IsValidPubKey(string & pubKey)
 {
 	if(IsHex(pubKey))
@@ -235,6 +268,42 @@ bool IsValidPubKey(string & pubKey)
 	} else {
 		return false;
 	}
+}
+
+bool IsValidPrivKey(string & privKey)
+{
+    CBitcoinSecret vchSecret;
+    bool fGood = vchSecret.SetString(privKey);
+	return fGood;
+}
+
+bool IsValidBitcoinAddress(string & address)
+{
+	Value ret;
+	Array par;
+	par.push_back(address);
+	bool allok=false;
+	try {
+		ret = validateaddress(par, false);
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	}
+	allok=ret.type() == obj_type;
+	if(allok)
+	{
+		Object obj = ret.get_obj();
+		ret = find_value(obj, "isvalid");
+		allok = ret.type() == bool_type;
+		if(allok)
+		{
+			allok=ret.get_bool();
+		}
+	}
+	return allok;
 }
 
 bool IsMineBitcoinAddress(string & address)
@@ -275,12 +344,21 @@ bool IsMinePubKey(string & pubKey)
 	return allok;
 }
 
+bool IsMinePrivKey(string & privKey)
+{
+	string address;
+	bool allok = GetBitcoinAddressOfPrivKey(privKey,address);
+	if(allok)
+		allok=IsMineBitcoinAddress(address);
+	return allok;
+}
+
 Value getpubkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getpubkey <bitcoinaddress>\n"
-            "Returns true or false.");
+            "Returns pubkey.");
 
 	string x = params[0].get_str();
 	string pubKey;
@@ -309,7 +387,7 @@ Value getprivkey(const Array& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getprivkey <bitcoinaddress>\n"
-            "Returns true or false.");
+            "Returns privkey.");
 
 	string x = params[0].get_str();
 	string privKey;
@@ -361,6 +439,38 @@ Value getbitcoinaddressofpubkey(const Array& params, bool fHelp)
 	return address;
 }
 
+Value getbitcoinaddressofprivkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "getbitcoinaddressofprivkey <privkey>\n"
+			"The privkey can you get from the getprivkey command!\n"
+            "Returns the bitcoin address.");
+
+	string x = params[0].get_str();
+	string address;
+    bool allok = GetBitcoinAddressOfPrivKey(x, address);
+	if(!allok)
+		address="";
+	return address;
+}
+
+Value getpubkeyofprivkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "getpubkeyofprivkey <privkey>\n"
+			"The privkey can you get from the getprivkey command!\n"
+            "Returns the pubkey of the privkey.");
+
+	string x = params[0].get_str();
+	string pubKey;
+    bool allok = GetPubKeyOfPrivKey(x, pubKey);
+	if(!allok)
+		pubKey="";
+	return pubKey;
+}
+
 Value isvalidpubkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
@@ -371,6 +481,31 @@ Value isvalidpubkey(const Array& params, bool fHelp)
 
 	string x = params[0].get_str();
     bool allok = IsValidPubKey(x);
+	return allok;
+}
+
+Value isvalidprivkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "isvalidprivkey <privkey>\n"
+			"The privkey can you get from the getprivkey command!\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    bool allok = IsValidPrivKey(x);
+	return allok;
+}
+
+Value isvalidbitcoinaddress(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "isvalidbitcoinaddress <bitcoinaddress>\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    bool allok = IsValidBitcoinAddress(x);
 	return allok;
 }
 
@@ -396,6 +531,19 @@ Value isminepubkey(const Array& params, bool fHelp)
 
 	string x = params[0].get_str();
     bool allok = IsMinePubKey(x);
+	return allok;
+}
+
+Value ismineprivkey(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "ismineprivkey <privkey>\n"
+			"The privkey can you get from the getprivkey command!\n"
+            "Returns true or false.");
+
+	string x = params[0].get_str();
+    bool allok = IsMinePrivKey(x);
 	return allok;
 }
 

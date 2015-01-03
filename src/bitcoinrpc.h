@@ -479,13 +479,18 @@ extern bool mygetnewaddress(std::string strAccount, std::string & myaddress);
 extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, json_spirit::Array & params);
 extern bool GetPrivKey(std::string & address, std::string & privKey);
 extern bool hasPrivKey(std::string & address);
-extern bool GetPubKey(std::string & address);
+extern bool GetPubKey(std::string & address, std::string & pubKey);
 extern bool hasPubKey(std::string & address, std::string & pubKey);
 extern bool isMultisigAddress(std::string & address);
+extern bool GetPubKeyOfPrivKey(std::string & privKey, std::string & pubKey);
+extern bool GetBitcoinAddressOfPrivKey(std::string & pubKey, std::string & address);
 extern bool GetBitcoinAddressOfPubKey(std::string & pubKey, std::string & address);
 extern bool IsValidPubKey(std::string & pubKey);
+extern bool IsValidPrivKey(std::string & privKey);
+extern bool IsValidBitcoinAddress(std::string & address);
 extern bool IsMineBitcoinAddress(std::string & address);
 extern bool IsMinePubKey(std::string & pubKey);
+extern bool IsMinePrivKey(std::string & pubKey);
 extern std::string encodeBase64Data(unsigned char * data, std::size_t & len);
 extern void decodeBase64Data(std::string & data, std::vector<unsigned char> & cpy, std::size_t & size);
 extern void decodeEnding(std::vector<unsigned char> & cpy, unsigned char * data, std::size_t & len);
@@ -634,9 +639,14 @@ extern json_spirit::Value getpubkey(const json_spirit::Array& params, bool fHelp
 extern json_spirit::Value haspubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value ismultisigaddress(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value getbitcoinaddressofpubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getbitcoinaddressofprivkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getpubkeyofprivkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value isvalidpubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value isvalidprivkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value isvalidbitcoinaddress(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value isminebitcoinaddress(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value isminepubkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value ismineprivkey(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value createmultisigex(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
 extern json_spirit::Value addmultisigex(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
 extern json_spirit::Value createtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
