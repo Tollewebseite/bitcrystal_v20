@@ -3,6 +3,7 @@
  */
 
 #include <QApplication>
+#include <QPalette>
 
 #include "bitcoingui.h"
 #include "clientmodel.h"
@@ -124,6 +125,9 @@ int main(int argc, char *argv[])
 
     Q_INIT_RESOURCE(bitcoin);
     QApplication app(argc, argv);
+	QPalette qPalette = app.palette();
+	qPalette.setColor(QPalette::ButtonText,QColor(255,255,255));
+	app.setPalette(qPalette);
 
     // Register meta types used for QMetaObject::invokeMethod
     qRegisterMetaType< bool* >();

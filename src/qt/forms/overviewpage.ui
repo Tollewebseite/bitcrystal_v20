@@ -55,7 +55,7 @@
                 </font>
                </property>
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string>Wallet</string>
@@ -68,7 +68,7 @@
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The displayed information may be out of date. Your wallet automatically synchronizes with the BitCrystal network after a connection is established, but this process has not completed yet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="styleSheet">
-                <string notr="true">QLabel { color: red; }</string>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string notr="true">(out of sync)</string>
@@ -107,7 +107,7 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label">
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string>Balance:</string>
@@ -129,7 +129,7 @@
                 <string>Your current balance</string>
                </property>
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string notr="true">0 BTQ</string>
@@ -142,7 +142,7 @@
              <item row="1" column="0">
               <widget class="QLabel" name="label_3">
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string>Unconfirmed:</string>
@@ -164,7 +164,7 @@
                 <string>Total of transactions that have yet to be confirmed, and do not yet count toward the current balance</string>
                </property>
                <property name="styleSheet">
-                <string notr="true">QLabel { color: green; }</string>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string notr="true">0 BTQ</string>
@@ -177,7 +177,7 @@
              <item row="2" column="0">
               <widget class="QLabel" name="labelImmatureText">
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string>Immature:</string>
@@ -196,7 +196,7 @@
                 <string>Mined balance that has not yet matured</string>
                </property>
                <property name="styleSheet">
-                <string notr="true">QLabel { color: red; }</string>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string notr="true">0 BTQ</string>
@@ -211,11 +211,17 @@
                <property name="text">
                 <string>Number of transactions:</string>
                </property>
+			   <property name="styleSheet">
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
+               </property>
               </widget>
              </item>
              <item row="3" column="1">
               <widget class="QLabel" name="labelNumTransactions">
-               <property name="toolTip">
+               <property name="styleSheet">
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
+               </property>
+			   <property name="toolTip">
                 <string>Total number of transactions in wallet</string>
                </property>
                <property name="text">
@@ -284,7 +290,7 @@
              <item>
               <widget class="QLabel" name="label_4">
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">QLabel { color: rgb(255, 255, 255); }</string>
                </property>
                <property name="text">
                 <string>&lt;b&gt;Recent transactions&lt;/b&gt;</string>

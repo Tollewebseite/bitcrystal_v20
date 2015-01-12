@@ -13,12 +13,19 @@ static const int STATUSBAR_ICONSIZE = 16;
 /* Invalid field background style */
 #define STYLE_INVALID "background:#FF8080"
 
+/* Default Colors */
+#define DEFAULT_COLOR_CONFIRMED option.palette.color(QPalette::Text)
+#define DEFAULT_COLOR_UNCONFIRMED QColor(128, 128, 128)
+#define DEFAULT_COLOR_NEGATIVE QColor(255, 0, 0)
+#define DEFAULT_COLOR_BAREADDRESS QColor(140, 140, 140)
+/* Text Color */
+#define COLOR_CONFIRMED QColor(255,255,255)
 /* Transaction list -- unconfirmed transaction */
-#define COLOR_UNCONFIRMED QColor(128, 128, 128)
+#define COLOR_UNCONFIRMED QColor(255,255,255)
 /* Transaction list -- negative amount */
-#define COLOR_NEGATIVE QColor(255, 0, 0)
+#define COLOR_NEGATIVE DEFAULT_COLOR_NEGATIVE
 /* Transaction list -- bare address (without label) */
-#define COLOR_BAREADDRESS QColor(140, 140, 140)
+#define COLOR_BAREADDRESS QColor(255,255,255)
 
 /* Tooltips longer than this (in characters) are converted into rich text,
    so that they can be word-wrapped.

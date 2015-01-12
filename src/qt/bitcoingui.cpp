@@ -6,8 +6,9 @@
  */
 
 #include <QApplication>
-
+ 
 #include "bitcoingui.h"
+//#include "qclickablelabel.h"
 
 #include "transactiontablemodel.h"
 #include "optionsdialog.h"
@@ -52,7 +53,6 @@
 #include <QListWidget>
 
 #include <iostream>
-
 const QString BitcoinGUI::DEFAULT_WALLET = "~Default";
 
 BitcoinGUI::BitcoinGUI(QWidget *parent) :
@@ -166,9 +166,19 @@ BitcoinGUI::~BitcoinGUI()
 void BitcoinGUI::createActions()
 {
     QActionGroup *tabGroup = new QActionGroup(this);
-
-    overviewAction = new QAction(QIcon(":/icons/overview"), tr("&Overview"), this);
-    overviewAction->setStatusTip(tr("Show general overview of wallet"));
+	//QWidgetAction *newAct = new QWidgetAction(this);
+    //QLabel *label = new QClickableLabel(tr("&Overview"), this);
+	//label->setStyleSheet("color: red");
+	//newAct->setDefaultWidget(label);
+	//newAct->setStatusTip(tr("Show general overview of wallet"));
+    //newAct->setToolTip(newAct->statusTip());
+    //newAct->setCheckable(true);
+    //newAct->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
+	//newAct->setIcon(QIcon(":/icons/overview"));
+	//overviewAction=newAct;
+	//tabGroup->addAction(overviewAction);
+	overviewAction = new QAction(QIcon(":/icons/overview"), tr("&Overview"), this);
+	overviewAction->setStatusTip(tr("Show general overview of wallet"));
     overviewAction->setToolTip(overviewAction->statusTip());
     overviewAction->setCheckable(true);
     overviewAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
