@@ -2,7 +2,9 @@ BitCrystal 2.0.0.0
 ====================
 
 Copyright (c) 2009-2013 Bitcoin Developers
+
 Copyright (c) 2013-2014 Bitquark Developers
+
 Copyright (c) 2014-2015 Bitcrystal Developers
 
 
