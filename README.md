@@ -1,4 +1,4 @@
-BitQuark 0.8.3.1
+BitCrystal 2.0.0.0
 ====================
 
 Copyright (c) 2009-2013 Bitcoin Developers
@@ -12,7 +12,7 @@ sphlib 3.0 by Thomas Pornin.
 
 Intro
 ---------------------
-BitQuark is a free open source peer-to-peer electronic cash system that is
+BitQrystal is a free open source peer-to-peer electronic cash system that is
 completely decentralized, without the need for a central server or trusted
 parties.  Users hold the crypto keys to their own money and transact directly
 with each other, with the help of a P2P network to check for double-spending.
@@ -20,8 +20,7 @@ with each other, with the help of a P2P network to check for double-spending.
 
 Setup
 ---------------------
-You need the Qt4 run-time libraries to run Bitcoin-Qt. On Debian or Ubuntu:
-	`sudo apt-get install libqtgui4`
+You need execute the bitcrystal.all.linux.make.sh
 
 
 Other Pages
