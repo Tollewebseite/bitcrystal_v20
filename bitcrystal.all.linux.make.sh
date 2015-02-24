@@ -34,6 +34,7 @@ if [[ $USE_OLD == "true" ]]; then
 else
 	if [[ ! -f /usr/local/lib/libboost_filesystem.so && ! -f /usr/lib/libboost_filesystem.so && ! -f /lib/libboost_filesystem.so ]]; then
 		$PREFIX aptitude install build-essential g++
+		$PREFIX wget http://downloads.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.bz2
 		$PREFIX tar xjf boost_1_55_0.tar.bz2
 		$PREFIX cd boost_1_55_0
 		$PREFIX ./bootstrap.sh --with-libraries=filesystem,program_options,system,thread --exec-prefix=/usr/local
