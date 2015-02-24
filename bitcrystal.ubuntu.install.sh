@@ -36,4 +36,5 @@ $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystald
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal-qt
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal_conf_update_ubuntu.sh
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal_conf_update.sh
+$PREFIX rm -r bitcrystal_v20 1> /dev/null 2> /dev/null
 $PREFIX echo bitcrystal installed
