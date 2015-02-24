@@ -19,13 +19,21 @@ $PREFIX apt-get install git
 $PREFIX git clone https://github.com/bitcrystal/bitcrystal_v20 -b update14
 $PREFIX cd bitcrystal_v20
 $PREFIX chmod 755 ./ -R
-$PREFIX ./bitcrystal.ubuntu.all.linux.make.sh
+$PREFIX ./bitcrystal.all.linux.make.sh
 $PREFIX rm /usr/bin/bitcrystald 1> /dev/null 2> /dev/null
 $PREFIX rm /usr/bin/bitcrystal-qt 1> /dev/null 2> /dev/null
+$PREFIX rm /usr/bin/bitcrystal_conf_update.sh 1> /dev/null 2> /dev/nul
+$PREFIX rm /usr/bin/bitcrystal_conf_update_ubuntu.sh 1> /dev/null 2> /dev/nul
 $PREFIX cp src/bitcrystald /usr/bin
 $PREFIX cp ./bitcrystal-qt /usr/bin
+$PREFIX cp ./bitcrystal_conf_update_ubuntu.sh /usr/bin
+$PREFIX cp ./bitcrystal_conf_update.sh /usr/bin
 $PREFIX chmod 755 /usr/bin/bitcrystald
 $PREFIX chmod 755 /usr/bin/bitcrystal-qt
+$PREFIX chmod 755 /usr/bin/bitcrystal_conf_update_ubuntu.sh
+$PREFIX chmod 755 /usr/bin/bitcrystal_conf_update.sh
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystald
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal-qt
+$PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal_conf_update_ubuntu.sh
+$PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal_conf_update.sh
 $PREFIX echo bitcrystal installed
