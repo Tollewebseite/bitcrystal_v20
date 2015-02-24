@@ -1,5 +1,6 @@
 #!/bin/bash
 CLEAN_PROJECT="true"
+USE_OLD="false"
 
 OS="DEBIAN"
 OS_VERSION="7.0"
@@ -21,11 +22,24 @@ $PREFIX apt-get install libdb++-dev
 $PREFIX apt-get install git curl-devel expat-devel gettext-devel openssl-devel zlib-devel
 $PREFIX apt-get install libxtst-dev build-essential libqt4-dev qt4-qmake
 $PREFIX apt-get install qrencode libqrencode3 libimager-qrcode-perl libtext-qrcode-perl python-qrencode libqrencode-dev
-
 if [ $OS_VERSION -le 11.10 ]; then
-        $PREFIX apt-get install qt4-qmake libqt4-dev build-essential libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libdb4.8++-dev libgmp3-dev libmpfr-dev
+        $PREFIX apt-get install qt4-qmake libqt4-dev build-essential libssl-dev libdb4.8++-dev libgmp3-dev libmpfr-dev
 else
-        $PREFIX apt-get install qt4-qmake libqt4-dev build-essential libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libdb++-dev libminiupnpc-dev libgmp3-dev libmpfr-dev
+        $PREFIX apt-get install qt4-qmake libqt4-dev build-essential libssl-dev libdb++-dev libminiupnpc-dev libgmp3-dev libmpfr-dev
+fi
+
+if [[ $USE_OLD == "true" ]]; then
+	$PREFIX apt-get install libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev
+	$PREFIX apt-get install libboost-all-dev
+else
+	if [[ ! -f /usr/local/lib/libboost_filesystem.so && ! -f /usr/lib/libboost_filesystem.so && ! -f /lib/libboost_filesystem.so ]]; then
+		$PREFIX aptitude install build-essential g++
+		$PREFIX tar xjf boost_1_55_0.tar.bz2
+		$PREFIX cd boost_1_55_0
+		$PREFIX ./bootstrap.sh --with-libraries=filesystem,program_options,system,thread --exec-prefix=/usr/local
+		$PREFIX ./bjam
+		$PREFIX ./bjam install
+	fi
 fi
 
 if [[ $CLEAN_PROJECT == "true" ]]; then
@@ -34,7 +48,6 @@ if [[ $CLEAN_PROJECT == "true" ]]; then
 fi
 $PREFIX apt-get install build-essential
 $PREFIX apt-get install libssl-dev
-$PREFIX apt-get install libboost-all-dev
 $PREFIX apt-get install libdb4.8-dev
 $PREFIX apt-get install libdb4.8++-dev
 $PREFIX apt-get install libminiupnpc-dev
