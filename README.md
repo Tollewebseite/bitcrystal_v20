@@ -20,4 +20,4 @@ with each other, with the help of a P2P network to check for double-spending.
 
 Setup
 ---------------------
-You need execute the bitcrystal.all.linux.make.sh
+You need execute the bitcrystal.install.sh and for ubuntu use please bitcrystal.ubuntu.install.sh
