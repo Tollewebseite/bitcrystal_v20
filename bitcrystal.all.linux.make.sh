@@ -19,6 +19,10 @@ $PREFIX rm src/leveldb/libleveldb.a
 $PREFIX make -f src/leveldb/Makefile -j4
 
 $PREFIX apt-get install libdb++-dev
+$PREFIX apt-get install libminiupnpc10
+$PREFIX apt-get install libminiupnpc-dev
+$PREFIX apt-get install libdb5.3++
+$PREFIX apt-get install libdb5.3++-dev
 $PREFIX apt-get install git curl-devel expat-devel gettext-devel openssl-devel zlib-devel
 $PREFIX apt-get install libxtst-dev build-essential libqt4-dev qt4-qmake
 $PREFIX apt-get install qrencode libqrencode3 libimager-qrcode-perl libtext-qrcode-perl python-qrencode libqrencode-dev
