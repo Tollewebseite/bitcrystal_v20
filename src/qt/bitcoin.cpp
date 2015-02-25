@@ -126,10 +126,12 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(bitcoin);
     QApplication app(argc, argv);
 	QPalette qPalette = app.palette();
+	qPalette.setColor(QPalette::WindowText,QColor(0,0,0));
 	qPalette.setColor(QPalette::Button,QColor(0,0,0));
 	qPalette.setColor(QPalette::Text,QColor(0,0,0));
-	qPalette.setColor(QPalette::ButtonText,QColor(0,252,255));
+	qPalette.setColor(QPalette::ButtonText,QColor(0,170,255));
 	qPalette.setColor(QPalette::HighlightedText,QColor(0,0,0));
+	qPalette.setColor(QPalette::ToolTipText,QColor(0,0,0));
 	qPalette.setColor(QPalette::BrightText,QColor(0,0,0));
 	app.setPalette(qPalette);
 

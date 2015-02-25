@@ -719,7 +719,7 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="styleSheet">
-          <string notr="true">color:white;font-weight:bold;</string>
+          <string notr="true">color:black;font-weight:bold;</string>
          </property>
          <property name="text">
           <string>Balance:</string>
@@ -732,10 +732,10 @@
           <cursorShape>IBeamCursor</cursorShape>
          </property>
          <property name="styleSheet">
-          <string notr="true">color:white;</string>
+          <string notr="true">color:black;</string>
          </property>
          <property name="text">
-          <string>123.456 BTQ</string>
+          <string>123.456 BTCRY</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>

@@ -21,11 +21,11 @@ static const int STATUSBAR_ICONSIZE = 16;
 /* Text Color */
 #define COLOR_CONFIRMED QColor(255,255,255)
 /* Transaction list -- unconfirmed transaction */
-#define COLOR_UNCONFIRMED QColor(255,255,255)
+#define COLOR_UNCONFIRMED DEFAULT_COLOR_UNCONFIRMED
 /* Transaction list -- negative amount */
 #define COLOR_NEGATIVE DEFAULT_COLOR_NEGATIVE
 /* Transaction list -- bare address (without label) */
-#define COLOR_BAREADDRESS QColor(255,255,255)
+#define COLOR_BAREADDRESS DEFAULT_COLOR_BAREADDRESS
 
 /* Tooltips longer than this (in characters) are converted into rich text,
    so that they can be word-wrapped.
