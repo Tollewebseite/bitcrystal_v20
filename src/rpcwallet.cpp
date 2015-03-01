@@ -215,7 +215,10 @@ bool GetMultisigAddresses(vector<my_multisigaddress> & my_multisigaddresses)
 			std::vector<CTxDestination> addresses;
 			txnouttype whichType;
 			int nRequired;
-			ExtractDestinations(cScript, whichType, addresses, nRequired);
+			if(!ExtractDestinations(cScript, whichType, addresses, nRequired))
+			{
+				continue;
+			}
 			if (whichType != TX_MULTISIG)
 				continue;
 			BOOST_FOREACH(const CTxDestination& addr, addresses)
@@ -1020,7 +1023,7 @@ Value createmultisigex(const Array& params, bool fHelp)
 		msg+=	"If set is not set then you need at least 1 public key of another wallet!\n";
         throw runtime_error(msg);
     }
-	string str;
+	string str = "invalid arguments!";
 	if(params[0].type()!=int_type||params[1].type()!=array_type)
 	{
 		return str;
@@ -1056,10 +1059,17 @@ Value createmultisigex(const Array& params, bool fHelp)
 		}
 	}
     // Construct using pay-to-script-hash:
-    CScript inner = _createmultisig(params);
-	unsigned char inner_s[sizeof(inner)];
-	memcpy((void*)&inner_s[0],(void*)&inner,sizeof(inner));
-    str = EncodeBase64(inner_s, sizeof(inner));
+    //CScript inner = _createmultisig(params);
+	//unsigned char inner_s[sizeof(inner)];
+	//memcpy((void*)&inner_s[0],(void*)&inner,sizeof(inner));
+    //str = EncodeBase64(inner_s, sizeof(inner));
+	//unsigned char inner_s[sizeof(params)];
+	//memcpy((void*)&inner_s[0],(void*)&params,sizeof(params));
+	//str = base64_encode((unsigned char const*)&inner_s[0], sizeof(params));
+	Value val = params;
+	str=write_string(val,false);
+	str=encode_security(str.c_str(),str.length());
+	str=base64_encode((unsigned char const*)str.c_str(), str.length());
     return str;
 }
 
@@ -1076,17 +1086,41 @@ Value addmultisigaddressex(const Array& params, bool fHelp)
 	string strAccount = "";
 	if(params.size()==2)
 		strAccount=params[1].get_str();
-	bool fDefault=false;
-    vector<unsigned char> ret = DecodeBase64(x.c_str(), &fDefault);
-	int size = ret.size();
-	unsigned char inner_s[size];
-	for(int i = 0; i < size; i++)
+	//bool fDefault=false;
+   // vector<unsigned char> ret = DecodeBase64(x.c_str(), &fDefault);
+	//int size = ret.size();
+	//unsigned char inner_s[size];
+	//for(int i = 0; i < size; i++)
+	//{
+	//	inner_s[i] = ret.at(i);
+	//}
+	//CScript * inner = (CScript*)&inner_s[0];
+	//CScriptID innerID = inner->GetID();
+	//pwalletMain->AddCScript(*inner);
+	//pwalletMain->SetAddressBookName(innerID, strAccount);
+	string decode = base64_decode(x);
+	decode = decode_security(decode);
+	Value val;
+	if(!read_string(decode,val))
+		return false;
+	if(val.type()!=array_type)
 	{
-		inner_s[i] = ret.at(i);
+		return false;
 	}
-	CScript * inner = (CScript*)&inner_s[0];
-	CScriptID innerID = inner->GetID();
-	pwalletMain->AddCScript(*inner);
+	Array array=val.get_array();
+	//int length = decode.length();
+	//unsigned char inner_s[length];
+	//char * ret = (char*)decode.c_str();
+	//memcpy((void*)&inner_s[0],(void*)&ret[0],length);
+	//Array * pars = (Array*)&inner_s[0];
+	//CScript inner = _createmultisig(params);
+	//CScript * inner = (CScript*)&ret[0];
+	//CScriptID innerID = inner->GetID();
+	//pwalletMain->AddCScript(*inner);
+	//pwalletMain->SetAddressBookName(innerID, strAccount);
+	CScript inner = _createmultisig(array);
+	CScriptID innerID = inner.GetID();
+	pwalletMain->AddCScript(inner);
 	pwalletMain->SetAddressBookName(innerID, strAccount);
 	return CBitcoinAddress(innerID).ToString();
 }

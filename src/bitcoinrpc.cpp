@@ -1203,8 +1203,8 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     if (strMethod == "addmultisigaddress"     && n > 1) ConvertTo<Array>(params[1]);
     if (strMethod == "createmultisig"         && n > 0) ConvertTo<boost::int64_t>(params[0]);
     if (strMethod == "createmultisig"         && n > 1) ConvertTo<Array>(params[1]);
-    if (strMethod == "createmultisigaddressex"         && n > 0) ConvertTo<boost::int64_t>(params[0]);
-    if (strMethod == "createmultisigaddressex"         && n > 1) ConvertTo<Array>(params[1]);
+    if (strMethod == "createmultisigex"         && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "createmultisigex"         && n > 1) ConvertTo<Array>(params[1]);
 	if (strMethod == "createtransaction_multisig"         && n > 2) ConvertTo<double>(params[2]);
 	if (strMethod == "createtransaction_multisig"         && n > 3) ConvertTo<double>(params[3]); 
     if (strMethod == "createrawtransaction_multisig"         && n > 2) ConvertTo<double>(params[2]);

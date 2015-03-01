@@ -1226,7 +1226,7 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 			obj.push_back(Pair("redeemScript", my_unspenttransactions.at(i).redeemScript));
 			arr.push_back(obj);
 			currentAmount+=my_unspenttransactions.at(i).amount;
-			if(i+1==size)
+			if(i+1==size&&currentAmount < tAmount)
 				return false;
 	}
 	params.push_back(arr);
