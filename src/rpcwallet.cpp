@@ -1012,6 +1012,140 @@ Value createmultisig(const Array& params, bool fHelp)
     return result;
 }
 
+Value createmultisigaddressex(const Array& params, bool fHelp)
+{
+	int size = params.size();
+    if (fHelp || size < 1)
+    {
+        string msg = "createmultisigaddressex <any values> <set>\n";
+        msg+=   	 "Creates a multi-signature address and returns a base64 encoded string\n";
+		msg+=        "You can supply any parameters.\n"; 
+		msg+=        "For example, if you passes only one address, the process still works\n"; 
+		msg+=        "and the output base64encoded string for the command addmultisigaddressex is created.\n"; 
+		msg+=        "Where nRequired is then automatically set to 1. \n";
+		msg+=        "For example \n";
+		msg+=        "createmultisigaddressex 1Dhjadiuwbadaadwerd 1D3jshdwjqddduw  1Dsiohfiugahbad\n";
+		msg+=        "nRequired is then automatically set to 3.\n";
+		msg+=        "But as usual you can also use the same parameters as in the command createmultisig or in the command createmultisigex. \n";
+		msg+=        "For example\n";
+		msg+=        "createmultisigex <nrequired> <'[\"key\",\"key\"]'> <set>\n";
+		msg+=        "or\n";
+		msg+=        "createmultisig <nrequired> <'[\"key\",\"key\"]'>\n";
+		msg+=        "But you can also just passed an array. Where nRequired is then automatically set to the size of the array. \n";
+		msg+=        "For example\n";
+		msg+=        "createmultisig <nrequired> <'[\"key\",\"key\"]'>\n";
+		msg+=        "nRequired is then automatically set to 2.\n";
+		msg+=        "You can pass as the first parameter an integer and then for example you can passes multiple addresses separated by spaces.\n";
+		msg+=        "Where nRequired will automatically be set to the first integer parameter.\n";
+		msg+=        "For example\n";
+		msg+=        "createmultisigaddressex 2 1Djhjkhjhjhkhjj 1Ddddjkhjhjhjjhjhj 1Djhjhjhjhjhjhj\n";
+		msg+=        "nRequired is automatically set to 2.\n";
+		msg+=		 "You can add the multisigaddress to the wallet with addmultisigaddressex <base64encodedstring>\n";
+		msg+=		 "If set is true or any value then you have the permission that all pubkeys can owned from your wallet!\n";
+		msg+=		 "If set is not set then you need at least 1 public key of another wallet!\n";
+        throw runtime_error(msg);
+    }
+	int nRequired=0;
+	Array newParams;
+	Array arr;
+	const int end=size-1;
+	string str;
+	bool array_is_set=false;
+	Value myval;
+	
+	for(int i = 0; i < size; i++)
+	{
+		myval=params[i];
+		if(i==0&&i!=end)
+		{	
+			if(myval.type()==str_type)
+			{
+				str=myval.get_str();
+				arr.push_back(str);
+				continue;
+			} else if(myval.type()==int_type) 
+			{
+				nRequired=myval.get_int();
+				continue;
+			} else if (myval.type()==array_type)
+			{
+				Array d = myval.get_array();
+				int mysize=d.size();
+				if(nRequired==0)
+				{
+					nRequired=mysize;
+				}
+				newParams.push_back(nRequired);
+				newParams.push_back(d);
+				array_is_set=true;
+			}
+		} else if (i==end) {				
+			if(myval.type()==str_type)
+			{
+				str=myval.get_str();
+				if(str.compare("true")!=0)
+				{
+					arr.push_back(str);
+					if(nRequired==0)
+					{
+						nRequired=arr.size();
+					}
+					if(!array_is_set)
+					{
+						newParams.push_back(nRequired);
+						newParams.push_back(arr);
+					}
+				} else {
+					if(nRequired==0)
+					{
+						nRequired=arr.size();
+					}
+					if(!array_is_set)
+					{
+						newParams.push_back(nRequired);
+						newParams.push_back(arr);
+						newParams.push_back("true");
+					} else {
+						newParams.push_back("true");
+					}
+				}
+			} else if (myval.type()==array_type)
+			{
+				if(array_is_set)
+					continue;
+				Array d = myval.get_array();
+				int mysize=d.size();
+				if(nRequired==0)
+				{
+					nRequired=mysize;
+				}
+				newParams.push_back(nRequired);
+				newParams.push_back(d);
+				array_is_set=true;
+			} 
+		} else {
+			if(myval.type()==str_type)
+			{
+				str=myval.get_str();
+				arr.push_back(str);
+			}
+		}
+	}
+	if(newParams.size()==0)
+	{
+		str="true";
+		newParams.push_back(1);
+		newParams.push_back(arr);
+		newParams.push_back(str);
+	} else if (newParams.size()==1)
+	{
+		str="true";
+		newParams.push_back(arr);
+		newParams.push_back(str);
+	}
+	return createmultisigex(newParams, false);
+}
+
 Value createmultisigex(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 3)

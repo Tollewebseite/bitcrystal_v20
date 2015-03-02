@@ -286,6 +286,7 @@ static const CRPCCommand vRPCCommands[] =
 	{ "isminepubkey",        &isminepubkey,        false,     false },
 	{ "ismineprivkey",        &ismineprivkey,        false,     false },
 	{ "createmultisigex",        &createmultisigex,        false,     false },
+	{ "createmultisigaddressex",        &createmultisigaddressex,        false,     false },
 	{ "addmultisigaddressex",        &addmultisigaddressex,        false,     false },
 	{ "createtransaction_multisig",        &createtransaction_multisig,        false,     false },
 	{ "createrawtransaction_multisig",        &createrawtransaction_multisig,        false,     false },
