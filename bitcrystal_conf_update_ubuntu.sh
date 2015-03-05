@@ -15,7 +15,11 @@ if [ $WHOAMI_ROOT -ne 0 ]; then
         echo "Are you running this script under root?"
         exit 0;
 fi
-
+$PREFIX echo start updating bitcrystal.conf
+$PREFIX echo just a momment please...
+$PREFIX echo;
+$PREFIX echo;
+$PREFIX echo;
 if [ ! -d $bitcrystalpath ]; then
 		$PREFIX mkdir $bitcrystalpath
 		$PREFIX chmod 755 $bitcrystalpath -R

@@ -1,4 +1,9 @@
 #!/bin/bash
+echo start updating bitcrystal.conf
+echo just a momment please...
+echo;
+echo;
+echo;
 rootpath=$HOME
 mypath=./
 bitcrystalpath=${rootpath}'/.bitcrystal_v20'
@@ -24,6 +29,7 @@ cp $bitcrystalconf /tmp
 rm ${mypath}'bitcrystal_conf_update.txt' 1> /dev/null 2> /dev/null
 wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/bitcrystal_conf_update.txt
 cat /tmp/bitcrystal.conf ${mypath}'bitcrystal_conf_update.txt' > $bitcrystalconf
+rm ${mypath}'bitcrystal_conf_update.txt' 1> /dev/null 2> /dev/null
 rm /tmp/bitcrystal.conf
 chmod 755 $bitcrystalconf
 chown $(whoami):$(whoami) $bitcrystalconf
