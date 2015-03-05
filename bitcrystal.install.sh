@@ -24,18 +24,26 @@ $PREFIX rm /usr/bin/bitcrystald 1> /dev/null 2> /dev/null
 $PREFIX rm /usr/bin/bitcrystal-qt 1> /dev/null 2> /dev/null
 $PREFIX rm /usr/bin/bitcrystal_conf_update.sh 1> /dev/null 2> /dev/nul
 $PREFIX rm /usr/bin/bitcrystal_conf_update_ubuntu.sh 1> /dev/null 2> /dev/nul
+$PREFIX rm /usr/bin/bitcrystal_bootstrap_update.sh 1> /dev/null 2> /dev/nul
+$PREFIX rm /usr/bin/bitcrystal_bootstrap_update_ubuntu.sh 1> /dev/null 2> /dev/nul
 $PREFIX cp src/bitcrystald /usr/bin
 $PREFIX cp ./bitcrystal-qt /usr/bin
 $PREFIX cp ./bitcrystal_conf_update_ubuntu.sh /usr/bin
 $PREFIX cp ./bitcrystal_conf_update.sh /usr/bin
+$PREFIX cp ./bitcrystal_bootstrap_update_ubuntu.sh /usr/bin
+$PREFIX cp ./bitcrystal_bootstrap_update.sh /usr/bin
 $PREFIX chmod 755 /usr/bin/bitcrystald
 $PREFIX chmod 755 /usr/bin/bitcrystal-qt
 $PREFIX chmod 755 /usr/bin/bitcrystal_conf_update_ubuntu.sh
 $PREFIX chmod 755 /usr/bin/bitcrystal_conf_update.sh
+$PREFIX chmod 755 /usr/bin/bitcrystal_bootstrap_update_ubuntu.sh
+$PREFIX chmod 755 /usr/bin/bitcrystal_bootstrap_update.sh
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystald
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal-qt
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal_conf_update_ubuntu.sh
 $PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal_conf_update.sh
+$PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal_bootstrap_update_ubuntu.sh
+$PREFIX chown $(whoami):$(whoami) /usr/bin/bitcrystal_bootstrap_update.sh
 $PREFIX cd ..
 $PREFIX rm -r ./bitcrystal_v20 1> /dev/null 2> /dev/null
 $PREFIX echo bitcrystal installed
