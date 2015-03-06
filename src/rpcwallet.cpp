@@ -1041,8 +1041,8 @@ Value createmultisigaddressex(const Array& params, bool fHelp)
 		msg+=        "createmultisigaddressex 2 1Djhjkhjhjhkhjj 1Ddddjkhjhjhjjhjhj 1Djhjhjhjhjhjhj\n";
 		msg+=        "nRequired is automatically set to 2.\n";
 		msg+=		 "You can add the multisigaddress to the wallet with addmultisigaddressex <base64encodedstring>\n";
-		msg+=		 "If set is true or any value then you have the permission that all pubkeys can owned from your wallet!\n";
-		msg+=		 "If set is not set then you need at least 1 public key of another wallet!\n";
+		msg+=		 "If set is true or any value then you have the permission that all pubkeys or addresses can owned from your wallet!\n";
+		msg+=		 "If set is not set then you need at least 1 public key or address of another wallet!\n";
         throw runtime_error(msg);
     }
 	int nRequired=0;
@@ -1052,10 +1052,45 @@ Value createmultisigaddressex(const Array& params, bool fHelp)
 	string str;
 	bool array_is_set=false;
 	Value myval;
-	
+	string e="";
+	bool set=false;
 	for(int i = 0; i < size; i++)
 	{
-		myval=params[i];
+		if(params[i].type()==str_type)
+		{
+			e = params[i].get_str();
+			if(!read_string(e,myval))
+			{
+				myval = e;
+			} else {
+				if(myval.type()!=array_type&&myval.type()!=bool_type)
+				{
+					int length=e.length();
+					int c=0;
+					for(int j = 0; j < length; j++)
+					{
+						c=(int)e.at(j);
+						if(c<48||c>57)
+						{
+							myval = e;
+							break;
+						}
+					}
+				}
+			}
+		} else {
+			myval = params[i];
+		}
+		if(myval.type()==bool_type)
+		{
+			set=myval.get_bool();
+			if(set)
+			{
+				myval = "true";
+			} else {
+				myval = "false";
+			}
+		}
 		if(i==0&&i!=end)
 		{	
 			if(myval.type()==str_type)
@@ -1079,7 +1114,7 @@ Value createmultisigaddressex(const Array& params, bool fHelp)
 				newParams.push_back(d);
 				array_is_set=true;
 			}
-		} else if (i==end) {				
+		} else if (i==end) {	
 			if(myval.type()==str_type)
 			{
 				str=myval.get_str();
@@ -1127,11 +1162,13 @@ Value createmultisigaddressex(const Array& params, bool fHelp)
 			if(myval.type()==str_type)
 			{
 				str=myval.get_str();
+				if(str.compare("true")==0)
+					continue;
 				arr.push_back(str);
 			}
 		}
 	}
-	if(newParams.size()==0)
+	/*if(newParams.size()==0)
 	{
 		str="true";
 		newParams.push_back(1);
@@ -1142,8 +1179,13 @@ Value createmultisigaddressex(const Array& params, bool fHelp)
 		str="true";
 		newParams.push_back(arr);
 		newParams.push_back(str);
+	}*/
+	try
+	{
+		return createmultisigex(newParams, false);
+	} catch (...) {
+		return "invalid arguments!";
 	}
-	return createmultisigex(newParams, false);
 }
 
 Value createmultisigex(const Array& params, bool fHelp)
@@ -1153,8 +1195,8 @@ Value createmultisigex(const Array& params, bool fHelp)
         string msg = "createmultisigex <nrequired> <'[\"key\",\"key\"]'> <set>\n";
         msg+=   "Creates a multi-signature address and returns a base64 encoded string\n";
 		msg+=	"You can add the multisigaddress to the wallet with addmultisigaddressex <base64encodedstring>\n";
-		msg+=	"If set is true or any value then you have the permission that all pubkeys can owned from your wallet!\n";
-		msg+=	"If set is not set then you need at least 1 public key of another wallet!\n";
+		msg+=	"If set is true or any value then you have the permission that all pubkeys or addresses can owned from your wallet!\n";
+		msg+=	"If set is not set then you need at least 1 public key or address of another wallet!\n";
         throw runtime_error(msg);
     }
 	string str = "invalid arguments!";
@@ -1257,6 +1299,76 @@ Value addmultisigaddressex(const Array& params, bool fHelp)
 	pwalletMain->AddCScript(inner);
 	pwalletMain->SetAddressBookName(innerID, strAccount);
 	return CBitcoinAddress(innerID).ToString();
+}
+
+Value createandaddmultisigaddressex(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 2)
+    {
+        string msg = "createandaddmultisigaddressex <any values> <strAccount> [<set>]\n";
+				msg+= "For questions to the <any values> parameter please type createmultisigaddressex without parameters\n";
+				msg+= "in the console!\n";
+				msg+= "<strAccount> account name there is added to the wallet.\n"; 
+				msg+= "[<set>] is a optional parameter, please type createmultisigaddressex without parameters in the console for questions to the parameter.\n";
+        throw runtime_error(msg);
+    }
+	int size=params.size();
+	Array nArray;
+	int nSize=size-1;
+	bool set=false;
+	string t="";
+	string current="";
+	if(params[nSize].type()==bool_type)
+	{
+		set=params[nSize].get_bool();
+		if(set)
+		{
+			current = "true";
+		} else {
+			current = "false";
+		}
+	} else {
+		current=params[nSize].get_str();
+	}
+	if(current.compare("true")==0)
+	{
+		nSize--;
+		for(int i = 0; i < nSize; i++)
+		{
+			t=params[i].get_str();
+			nArray.push_back(t);
+		}
+		nArray.push_back(current);
+		current=params[nSize].get_str();
+	} else {
+		for(int i = 0; i < nSize; i++)
+		{
+			t=params[i].get_str();
+			nArray.push_back(t);
+		}
+	}
+	try
+	{
+		const Value & nval = createmultisigaddressex(nArray, false);
+		if (nval.type()==str_type)
+		{
+			t = nval.get_str();
+			if(t.compare("invalid arguments!")==0)
+			{
+				return t;
+			}
+			nArray.clear();
+			nArray.push_back(t);
+			nArray.push_back(current);
+			return addmultisigaddressex(nArray,false);
+		} else {
+			t = "invalid arguments!";
+			return t;
+		}
+	} catch (...) {
+		t = "invalid arguments!";
+		return t;
+	}
 }
 
 

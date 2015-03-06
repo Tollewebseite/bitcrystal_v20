@@ -1101,7 +1101,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees, unsigned int nBits)
 	{
 		nSubsidy >>= (nHeight/10);
 		return nSubsidy;
-	} else if (nHeight < 30000) {
+	} else if (nHeight < 30000 || nHeight % 30000 != 0) {
 		// Subsidy is cut in half every 1440 blocks (1 days)
 		nSubsidy = nBlockRewardLastCoin;
 		nSubsidy >>= (nHeight / 1440);

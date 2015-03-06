@@ -35,4 +35,5 @@ del /f /q /s "%mypath%bootstrap.dat.old" 1> nul 2> nul
 del /f /q /s "%mypath%bootstrap.dat" 1> nul 2> nul
 del /f /q /s "%mypath%bootstrap.tar" 1> nul 2> nul
 del /f /q /s "%mypath%bootstrap.tar.gz" 1> nul 2> nul
-start bitcrystal-qt.exe
+start "" "%~dp0bitcrystal-qt.exe"
+exit 0

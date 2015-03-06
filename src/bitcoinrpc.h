@@ -650,6 +650,7 @@ extern json_spirit::Value ismineprivkey(const json_spirit::Array& params, bool f
 extern json_spirit::Value createmultisigex(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
 extern json_spirit::Value createmultisigaddressex(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
 extern json_spirit::Value addmultisigaddressex(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
+extern json_spirit::Value createandaddmultisigaddressex(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
 extern json_spirit::Value createtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value createrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value decoderawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
