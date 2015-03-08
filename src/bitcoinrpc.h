@@ -476,7 +476,7 @@ extern bool GetMultisigAccountAddress(std::string & strAccount, my_multisigaddre
 extern bool GetMultisigDataFromAddress(std::string & address, my_multisigaddress & my);
 extern bool hasRedeemScript(std::string address);
 extern bool mygetnewaddress(std::string strAccount, std::string & myaddress);
-extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, json_spirit::Array & params);
+extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, json_spirit::Array & params);
 extern bool GetPrivKey(std::string & address, std::string & privKey);
 extern bool hasPrivKey(std::string & address);
 extern bool GetPubKey(std::string & address, std::string & pubKey);
@@ -494,6 +494,13 @@ extern bool IsMinePrivKey(std::string & pubKey);
 extern std::string encodeBase64Data(unsigned char * data, std::size_t & len);
 extern void decodeBase64Data(std::string & data, std::vector<unsigned char> & cpy, std::size_t & size);
 extern void decodeEnding(std::vector<unsigned char> & cpy, unsigned char * data, std::size_t & len);
+extern void encodeDataSecurity(std::string &y, std::string & encodevalue);
+extern void decodeDataSecurity(std::string &str, std::string & decodevalue);
+extern void encodeDataSecurityEx(std::string &y, std::string & encodevalue);
+extern void decodeDataSecurityEx(std::string &str, std::string & decodevalue);
+extern bool GetMultisigAddressOfAddressOrAccount(std::string & account_or_address);
+extern int GetTotalConfirmationsOfTxids(const json_spirit::Array & txids);
+extern int GetAverageConfirmationsOfTxids(const json_spirit::Array & txids);
 json_spirit::Object JSONRPCError(int code, const std::string& message);
 
 void StartRPCThreads();
@@ -657,4 +664,7 @@ extern json_spirit::Value decoderawtransaction_multisig(const json_spirit::Array
 extern json_spirit::Value signrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value sendrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value signandsendrawtransaction_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getmultisigaddressofaddressoraccount(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value gettotalconfirmationsoftxids(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getaverageconfirmationsoftxids(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 #endif

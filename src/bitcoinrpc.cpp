@@ -266,7 +266,10 @@ static const CRPCCommand vRPCCommands[] =
     { "sendrawtransaction",     &sendrawtransaction,     false,     false },
     { "gettxoutsetinfo",        &gettxoutsetinfo,        true,      false },
     { "gettxout",               &gettxout,               true,      false },
-    { "lockunspent",            &lockunspent,            false,     false },
+	{ "gettotalconfirmationsoftxids",               &gettotalconfirmationsoftxids,               false,      false },
+	{ "getaverageconfirmationsoftxids",               &getaverageconfirmationsoftxids,               false,      false },
+    { "getmultisigaddressofaddressoraccount",               &getmultisigaddressofaddressoraccount,               false,      false },
+	{ "lockunspent",            &lockunspent,            false,     false },
     { "listlockunspent",        &listlockunspent,        false,     false },
 	{ "my_outputrawtransaction",        &my_outputrawtransaction,        false,     false },
 	{ "listtransactions_multisig",        &listtransactions_multisig,        false,     false },
@@ -1209,9 +1212,11 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     if (strMethod == "createmultisigex"         && n > 1) ConvertTo<Array>(params[1]);
 	if (strMethod == "createtransaction_multisig"         && n > 2) ConvertTo<double>(params[2]);
 	if (strMethod == "createtransaction_multisig"         && n > 3) ConvertTo<double>(params[3]); 
-    if (strMethod == "createrawtransaction_multisig"         && n > 2) ConvertTo<double>(params[2]);
+    if (strMethod == "createtransaction_multisig"         && n > 4) ConvertTo<boost::int64_t>(params[4]); 
+	if (strMethod == "createrawtransaction_multisig"         && n > 2) ConvertTo<double>(params[2]);
 	if (strMethod == "createrawtransaction_multisig"         && n > 3) ConvertTo<double>(params[3]);  	
-    if (strMethod == "signrawtransaction_multisig"         && n > 1) ConvertTo<boost::int64_t>(params[1]);  
+    if (strMethod == "createrawtransaction_multisig"         && n > 4) ConvertTo<boost::int64_t>(params[4]); 
+	if (strMethod == "signrawtransaction_multisig"         && n > 1) ConvertTo<boost::int64_t>(params[1]);  
 	if (strMethod == "listunspent"            && n > 0) ConvertTo<boost::int64_t>(params[0]);
     if (strMethod == "listunspent"            && n > 1) ConvertTo<boost::int64_t>(params[1]);
     if (strMethod == "listunspent"            && n > 2) ConvertTo<Array>(params[2]);

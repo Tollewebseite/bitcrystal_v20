@@ -101,6 +101,8 @@ Value dumpprivkey(const Array& params, bool fHelp)
     return CBitcoinSecret(vchSecret, fCompressed).ToString();
 }
 
+
+
 bool GetPrivKey(std::string & address, std::string & privKey)
 {
 	Value ret;
@@ -750,6 +752,71 @@ bool getrawtransactiondetails(std::string & txid, my_rawtransactioninformation &
 	return allok;
 }
 
+int GetTotalConfirmationsOfTxids(const Array & txids)
+{
+	if(txids.size()<=0)
+	{
+		return -1;
+	}
+	int size = txids.size();
+	int confirmations = 0;
+	string x = "";
+	my_rawtransactioninformation my;
+	bool allok=false;
+	for(int i = 0; i < size; i++)
+	{
+		if(txids[i].type()!=str_type)
+			return -1;
+		my.clear();
+		x = txids[i].get_str();
+		allok = getrawtransactiondetails(x, my);
+		if(!allok)
+		{
+			return -1;
+		}
+		confirmations += my.confirmations;
+	}
+	return confirmations;
+}
+
+int GetAverageConfirmationsOfTxids(const Array & txids)
+{
+	int confirmations =  GetTotalConfirmationsOfTxids(txids);
+	if(confirmations==-1)
+		return -1;
+	int size = txids.size();
+	int averageconfirmations = ((int)(((float)confirmations/(float)size)+0.5f));
+	return averageconfirmations;
+}
+
+Value gettotalconfirmationsoftxids(const Array & params, bool fHelp)
+{
+	if(fHelp || params.size() < 1)
+	{
+		throw runtime_error("gettotalconfirmationsoftxids <Array of txids>\n");
+	}
+	int confirmations = GetTotalConfirmationsOfTxids(params);
+	if(confirmations == -1)
+	{
+		return false;
+	}
+	return confirmations;
+}
+
+Value getaverageconfirmationsoftxids(const Array & params, bool fHelp)
+{
+	if(fHelp || params.size() < 1)
+	{
+		throw runtime_error("getaverageconfirmationsoftxids <Array of txids>\n");
+	}
+	int averageconfirmations = GetAverageConfirmationsOfTxids(params);
+	if(averageconfirmations == -1)
+	{
+		return false;
+	}
+	return averageconfirmations;
+}
+
 Value my_outputrawtransaction(const Array& params, bool fHelp)
 {
 	if (fHelp || params.size() != 1)
@@ -1181,8 +1248,40 @@ bool mygetnewaddress(std::string strAccount, std::string & myaddress)
 	return true;
 }
 
-bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, Array & params)
+bool GetMultisigAddressOfAddressOrAccount(std::string & account_or_address)
 {
+	my_multisigaddress my;
+	if(!hasRedeemScript(account_or_address))
+	{
+		if(!GetMultisigAccountAddress(account_or_address,my))
+		{
+				return false;
+		}
+		account_or_address=my.address;
+		return true;
+	} else {
+		return true;
+	}
+}
+
+Value getmultisigaddressofaddressoraccount(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() < 1 || params.size() > 1)
+        throw runtime_error("getmultisigaddressofaddressoraccount <account_or_address>\n"
+							"Returns a multisigaddress or false if you give not a valid account or address!\n");
+	string x=params[0].get_str();
+	bool allok = GetMultisigAddressOfAddressOrAccount(x);
+	if(!allok)
+		return false;
+	return x;
+}
+
+bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & params)
+{
+	if(minconfirmations<0)
+	{
+		minconfirmations=0;
+	}
 	if(fee<0)
 		fee=0;
 	my_multisigaddress my;
@@ -1213,6 +1312,8 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 	double tAmount=amount+fee;
 	double currentAmount = 0;
 	int size=my_unspenttransactions.size();
+	Array arr2;
+	Array paramsR;
 	for(int i = 0; i < size; i++)
 	{
 			if(currentAmount >= tAmount)
@@ -1224,55 +1325,96 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 			obj.push_back(Pair("vout", my_unspenttransactions.at(i).vout));
 			obj.push_back(Pair("scriptPubKey", my_unspenttransactions.at(i).scriptPubKey));
 			obj.push_back(Pair("redeemScript", my_unspenttransactions.at(i).redeemScript));
-			arr.push_back(obj);
-			currentAmount+=my_unspenttransactions.at(i).amount;
+			if(my_unspenttransactions.at(i).confirmations>=minconfirmations)
+			{
+				arr2.push_back(my_unspenttransactions.at(i).txid);
+				arr.push_back(obj);
+				currentAmount+=my_unspenttransactions.at(i).amount;
+			}
 			if(i+1==size&&currentAmount < tAmount)
+			{
 				return false;
+			}
 	}
-	params.push_back(arr);
+	paramsR.push_back(arr);
 	Object obj2;
 	double diff=currentAmount-amount-fee;
 	obj2.push_back(Pair(receive_address,amount));
 	if(diff>0)
 		obj2.push_back(Pair(change_address,diff));
-	params.push_back(obj2);
+	paramsR.push_back(obj2);
+	params.push_back(paramsR);
+	params.push_back(arr2);
 }
 
 Value createtransaction_multisig(const Array& params, bool fHelp)
 {
-	if (fHelp || params.size() < 4 || params.size() > 4)
-        throw runtime_error("createtransaction_multisig <account_or_address> <receive_address> <amount> <fee>\n"
+	if (fHelp || params.size() < 4 || params.size() > 5)
+        throw runtime_error("createtransaction_multisig <account_or_address> <receive_address> <amount> <fee> [<min_confirmations>]\n"
 							"Returns a json array!\n");
 	string account_or_address=params[0].get_str();
 	string receive_address=params[1].get_str();
 	double amount = params[2].get_real();
 	double fee = params[3].get_real();
+	int minconfirmations = 0;
+	if(params.size()==5)
+	{
+		minconfirmations=params[4].get_int();
+	}
 	Array arr;
-	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, arr);
+	Array arr2;
+	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, minconfirmations, arr);
 	if(!allok)
 	{
-		arr.clear();
-	} 
-	return arr;
+		return arr2;
+	}
+	if(arr.size()==2)
+	{
+		if(arr[0].type()==array_type)
+		{
+			arr2 = arr[0].get_array();
+		}
+	}
+	return arr2;
 }
 
 Value createrawtransaction_multisig(const Array& params, bool fHelp)
 {
-	if (fHelp || params.size() < 4 || params.size() > 5)
-        throw runtime_error("createrawtransaction_multisig <account_or_address> <receive_address> <amount> <fee> [<set>]\n"
-							"if set is true then the output is a object\n"
-							"if not the output is a enncrypted + base64 encoded string\n");
+	if (fHelp || params.size() < 4 || params.size() > 6)
+        throw runtime_error("createrawtransaction_multisig <account_or_address> <receive_address> <amount> <fee> [<minconfirmations>] [<set>]\n"
+							"minconfirmations is a optional parameter and is the value of confirmations that a unspent txid transaction at least must have\n"
+							"to can build the transaction, default is 0 if you not set this parameter\n"
+							"set is a optional parameter and if set is true then the output is a object\n"
+							"if set is not set the output is a enncrypted + base64 encoded string\n");
 	string account_or_address=params[0].get_str();
 	string receive_address=params[1].get_str();
 	double amount = params[2].get_real();
 	double fee = params[3].get_real();
-	bool set = params.size()==5;
+	bool set = params.size()==6;
+	int minconfirmations = 0;
+	if(params.size()>=5)
+	{
+		minconfirmations=params[4].get_int();
+	}
 	Array arr;
-	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, arr);
+	Array arrtmp;
+	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, minconfirmations, arr);
 	if(!allok)
 	{
 		arr.clear();
-	} 
+	}
+	Array arr1;
+	if(arr.size()==2)
+	{
+		if(arr[0].type()!=array_type)
+		{
+			arr.clear();
+		} else {
+			arrtmp=arr[0].get_array();
+			arr1=arr[1].get_array();
+			arr=arrtmp;
+		}
+	}
 	Value ret;
 	allok=true;
 	try {
@@ -1304,6 +1446,12 @@ Value createrawtransaction_multisig(const Array& params, bool fHelp)
 	obj.push_back(Pair("addresses", my.addressesJSON));
 	obj.push_back(Pair("complete", false));
 	obj.push_back(Pair("issended", false));
+	obj.push_back(Pair("usedunspenttxids", arr1));
+	int mysize=arr1.size();
+	obj.push_back(Pair("usedunspenttxidsamount", mysize));
+	const Array & pax = arr1;
+	obj.push_back(Pair("averageconfirmations", GetAverageConfirmationsOfTxids(pax)));
+	obj.push_back(Pair("minconfirmations", minconfirmations));
 	string y;
 	if(set)
 	{
@@ -1312,10 +1460,9 @@ Value createrawtransaction_multisig(const Array& params, bool fHelp)
 		Value val = obj;
 		y = write_string(val,true);
 	}
-	string encode = encode_security(y.c_str(), y.length());
-	size_t len = encode.length();
-	string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
-	return encode2;
+	string encode="";
+	encodeDataSecurityEx(y,encode);
+	return encode;
 }	
 
 Value decoderawtransaction_multisig(const Array& params, bool fHelp)
@@ -1327,19 +1474,8 @@ Value decoderawtransaction_multisig(const Array& params, bool fHelp)
 	string str=params[0].get_str();
 	try
 	{
-		vector<unsigned char> cpy;
-		size_t size;
-		decodeBase64Data(str, cpy, size);
-		char ptr[size];
-		decodeEnding(cpy,(unsigned char*)&ptr[0],size);
-		str="";
-		str.resize(size,0);
-		char * current = (char*)str.c_str();
-		for(int i = 0; i < size;i++)
-		{
-			current[i]=ptr[i];
-		}
-		string ret=decode_security(str);
+		string ret="";
+		decodeDataSecurityEx(str,ret);
 		Value val;
 		if(!read_string(ret,val))
 			return false;
@@ -1387,7 +1523,10 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 	Value ret;
 	string z=params[0].get_str();
 	Array par2;
+	Array usedtxids;
+	int averageconfirmations=0;
 	par2.push_back(z);
+	int minconfirmations=0;
 	try
 	{
 		ret=decoderawtransaction_multisig(par2,false);
@@ -1402,8 +1541,18 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 		bool complete = ret.get_bool();
 		if(complete)
 		{
-			return obj;
+			return false;
 		}
+		ret=find_value(obj,"usedunspenttxids");
+		if(ret.type()==null_type)
+			return false;
+		usedtxids=ret.get_array();
+		ret=find_value(obj,"minconfirmations");
+		if(ret.type()==null_type)
+			return false;
+		minconfirmations=ret.get_int();
+		const Array & pax = usedtxids;
+		averageconfirmations = GetAverageConfirmationsOfTxids(pax);
 		ret=find_value(obj,"hex");
 		if(ret.type()==null_type)
 			return false;
@@ -1481,6 +1630,11 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 		obj3.push_back(Pair("addresses", addresses));
 		obj3.push_back(Pair("complete", is_completed));
 		obj3.push_back(Pair("issended", false));
+		obj3.push_back(Pair("usedunspenttxids", usedtxids));
+		int mysize=usedtxids.size();
+		obj3.push_back(Pair("usedunspenttxidsamount", mysize));
+		obj3.push_back(Pair("averageconfirmations", averageconfirmations));
+		obj3.push_back(Pair("minconfirmations", minconfirmations));
 		string y;
 		if(set)
 		{
@@ -1489,10 +1643,9 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 			Value val = obj3;
 			y = write_string(val,true);
 		}
-		string encode = encode_security(y.c_str(), y.length());
-		size_t len = encode.length();
-		string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
-		return encode2;
+		string encode = "";
+		encodeDataSecurityEx(y,encode);
+		return encode;
 	} catch (runtime_error ex) {
 		allok=false;
 		return allok;
@@ -1517,6 +1670,9 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 	Array par2;
 	par2.push_back(z);
 	Value ret;
+	Array usedtxids;
+	int averageconfirmations;
+	int minconfirmations=0;
 	try
 	{
 		ret=decoderawtransaction_multisig(par2,false);
@@ -1533,6 +1689,16 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 		{
 			return false;
 		}
+		ret=find_value(obj,"usedunspenttxids");
+		if(ret.type()==null_type)
+			return false;
+		usedtxids=ret.get_array();
+		ret=find_value(obj,"minconfirmations");
+		if(ret.type()==null_type)
+			return false;
+		minconfirmations=ret.get_int();
+		const Array & pax = usedtxids;
+		averageconfirmations = GetAverageConfirmationsOfTxids(pax);
 		ret=find_value(obj,"complete");
 		if(ret.type()==null_type)
 			return false;
@@ -1571,6 +1737,11 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 		obj3.push_back(Pair("addresses", addresses));
 		obj3.push_back(Pair("complete", true));
 		obj3.push_back(Pair("issended", true));
+		obj3.push_back(Pair("usedunspenttxids", usedtxids));
+		int mysize=usedtxids.size();
+		obj3.push_back(Pair("usedunspenttxidsamount", mysize));
+		obj3.push_back(Pair("averageconfirmations", averageconfirmations));
+		obj3.push_back(Pair("minconfirmations", minconfirmations));
 		string y;
 		if(set)
 		{
@@ -1579,10 +1750,9 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 			Value val = obj3;
 			y = write_string(val,true);
 		}
-		string encode = encode_security(y.c_str(), y.length());
-		size_t len = encode.length();
-		string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
-		return encode2;
+		string encode = "";
+		encodeDataSecurityEx(y,encode);
+		return encode;
 	} catch (runtime_error ex) {
 		allok=false;
 		return allok;
@@ -1659,6 +1829,66 @@ Value signandsendrawtransaction_multisig(const Array& params, bool fHelp)
 	} catch (std::exception ex) {
 		allok=false;
 		return allok;
+	}
+}
+
+void encodeDataSecurityEx(string &y, string & encodevalue)
+{
+	try
+	{
+		encodeDataSecurity(y,encodevalue);
+	} catch (...) {
+		y="";
+		encodevalue="";
+	}
+}
+
+void decodeDataSecurityEx(string &str, string & decodevalue)
+{
+	try
+	{
+		decodeDataSecurity(str,decodevalue);
+	} catch (...) {
+		str="";
+		decodevalue="";
+	}
+}
+
+void encodeDataSecurity(string &y, string & encodevalue)
+{
+	try
+	{
+		string encode = encode_security(y.c_str(), y.length());
+		size_t len = encode.length();
+		string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		encodevalue=encode2;
+	} catch (...) {
+		y="";
+		encodevalue="";
+	}
+}
+
+void decodeDataSecurity(string &str, string & decodevalue)
+{
+	try
+	{
+		vector<unsigned char> cpy;
+		size_t size;
+		decodeBase64Data(str, cpy, size);
+		char ptr[size];
+		decodeEnding(cpy,(unsigned char*)&ptr[0],size);
+		str="";
+		str.resize(size,0);
+		char * current = (char*)str.c_str();
+		for(int i = 0; i < size;i++)
+		{
+			current[i]=ptr[i];
+		}
+		string ret=decode_security(str);
+		decodevalue=ret;
+	} catch (...) {
+		str="";
+		decodevalue="";
 	}
 }
 
