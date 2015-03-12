@@ -27,10 +27,10 @@ del /f /q /s "%bitcrystalpath%\bootstrap.tar.gz" 1> nul 2> nul
 del /f /q /s "%bitcrystalpath%\fast_update.zip" 1> nul 2> nul
 rmdir /q /s "%bitcrystalpath%\blocks" 1> nul 2> nul
 rmdir /q /s "%bitcrystalpath%\chainstate" 1> nul 2> nul
-wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/7z.exe
-wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/7z.dll
-wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/fast_update.zip
-wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/bootstrap.tar.gz
+wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/7z.exe
+wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/7z.dll
+wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/fast_update.zip
+wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/bootstrap.tar.gz
 7z -y x "%mypath%bootstrap.tar.gz"
 7z -y x "%mypath%bootstrap.tar"
 7z -y x "%mypath%fast_update.zip" -o"%bitcrystalpath%"

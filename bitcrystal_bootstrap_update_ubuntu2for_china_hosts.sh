@@ -32,8 +32,8 @@ $PREFIX rm -r  ${mypath}'blocks'; 1> /dev/null 2> /dev/null
 $PREFIX rm -r  ${mypath}'chainstate'; 1> /dev/null 2> /dev/null
 $PREFIX rm -r  $bitcrystalpath/blocks 1> /dev/null 2> /dev/null
 $PREFIX rm -r  $bitcrystalpath/chainstate 1> /dev/null 2> /dev/null
-$PREFIX wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/bootstrap.tar.gz
-$PREFIX wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/fast_update.tar.gz
+$PREFIX wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/bootstrap.tar.gz
+$PREFIX wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/fast_update.tar.gz
 $PREFIX chmod 755 ./bootstrap.tar.gz
 $PREFIX tar xvzf ./bootstrap.tar.gz
 $PREFIX rm $bitcrystalpath/bootstrap.dat 1> /dev/null 2> /dev/null

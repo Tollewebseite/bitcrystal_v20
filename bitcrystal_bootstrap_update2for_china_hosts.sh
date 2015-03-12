@@ -22,8 +22,8 @@ rm -r  $bitcrystalpath/blocks 1> /dev/null 2> /dev/null
 rm -r  $bitcrystalpath/chainstate 1> /dev/null 2> /dev/null
 rm $bitcrystalpath/bootstrap.dat 1> /dev/null 2> /dev/null
 rm $bitcrystalpath/bootstrap.dat.old 1> /dev/null 2> /dev/null
-wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/bootstrap.tar.gz
-wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/fast_update.tar.gz
+wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/bootstrap.tar.gz
+wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/fast_update.tar.gz
 chmod 755 ./bootstrap.tar.gz
 tar xvzf ./bootstrap.tar.gz
 chmod 755 ./fast_update.tar.gz
