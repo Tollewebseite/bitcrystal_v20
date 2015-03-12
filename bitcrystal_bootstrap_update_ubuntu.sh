@@ -30,6 +30,7 @@ $PREFIX rm ${mypath}'fast_update.tar.gz' 1> /dev/null 2> /dev/null
 $PREFIX rm ${mypath}'fast_update.tar.gz' 1> /dev/null 2> /dev/null
 $PREFIX rm -r  ${mypath}'blocks'; 1> /dev/null 2> /dev/null
 $PREFIX rm -r  ${mypath}'chainstate'; 1> /dev/null 2> /dev/null
+$PREFIX rm -r  $bitcrystalpath/database 1> /dev/null 2> /dev/null
 $PREFIX rm -r  $bitcrystalpath/blocks 1> /dev/null 2> /dev/null
 $PREFIX rm -r  $bitcrystalpath/chainstate 1> /dev/null 2> /dev/null
 $PREFIX wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/bootstrap.tar.gz

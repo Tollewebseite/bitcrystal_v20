@@ -18,6 +18,7 @@ rm ${mypath}'fast_update.tar.gz' 1> /dev/null 2> /dev/null
 rm ${mypath}'fast_update.tar.gz' 1> /dev/null 2> /dev/null
 rm -r  ${mypath}'blocks'; 1> /dev/null 2> /dev/null
 rm -r  ${mypath}'chainstate'; 1> /dev/null 2> /dev/null
+rm -r  $bitcrystalpath/database 1> /dev/null 2> /dev/null
 rm -r  $bitcrystalpath/blocks 1> /dev/null 2> /dev/null
 rm -r  $bitcrystalpath/chainstate 1> /dev/null 2> /dev/null
 rm $bitcrystalpath/bootstrap.dat 1> /dev/null 2> /dev/null

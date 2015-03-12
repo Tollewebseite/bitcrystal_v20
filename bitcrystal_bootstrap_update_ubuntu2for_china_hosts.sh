@@ -39,6 +39,7 @@ $PREFIX tar xvzf ./bootstrap.tar.gz
 $PREFIX rm $bitcrystalpath/bootstrap.dat 1> /dev/null 2> /dev/null
 $PREFIX chmod 755 ./fast_update.tar.gz
 $PREFIX tar xvzf ./fast_update.tar.gz
+$PREFIX rm -r  $bitcrystalpath/database 1> /dev/null 2> /dev/null
 $PREFIX rm -r  $bitcrystalpath/blocks 1> /dev/null 2> /dev/null
 $PREFIX rm -r  $bitcrystalpath/chainstate 1> /dev/null 2> /dev/null
 $PREFIX mv ./blocks $bitcrystalpath

@@ -20,6 +20,7 @@ rm -r  ${mypath}'blocks'; 1> /dev/null 2> /dev/null
 rm -r  ${mypath}'chainstate'; 1> /dev/null 2> /dev/null
 rm -r  $bitcrystalpath/blocks 1> /dev/null 2> /dev/null
 rm -r  $bitcrystalpath/chainstate 1> /dev/null 2> /dev/null
+rm -r  $bitcrystalpath/database 1> /dev/null 2> /dev/null
 rm $bitcrystalpath/bootstrap.dat 1> /dev/null 2> /dev/null
 rm $bitcrystalpath/bootstrap.dat.old 1> /dev/null 2> /dev/null
 wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/bootstrap.tar.gz

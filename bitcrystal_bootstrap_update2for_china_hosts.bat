@@ -25,6 +25,7 @@ del /f /q /s "%bitcrystalpath%\bootstrap.dat" 1> nul 2> nul
 del /f /q /s "%bitcrystalpath%\bootstrap.tar" 1> nul 2> nul
 del /f /q /s "%bitcrystalpath%\bootstrap.tar.gz" 1> nul 2> nul
 del /f /q /s "%bitcrystalpath%\fast_update.zip" 1> nul 2> nul
+rmdir /q /s "%bitcrystalpath%\database" 1> nul 2> nul
 rmdir /q /s "%bitcrystalpath%\blocks" 1> nul 2> nul
 rmdir /q /s "%bitcrystalpath%\chainstate" 1> nul 2> nul
 wget http://bitcrystaldownload2.demon-craft.de/bitcrystal_conf_update/7z.exe
