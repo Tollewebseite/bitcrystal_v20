@@ -298,6 +298,10 @@ static const CRPCCommand vRPCCommands[] =
 	{ "signrawtransaction_multisig",        &signrawtransaction_multisig,        false,     false },
 	{ "sendrawtransaction_multisig",        &sendrawtransaction_multisig,        false,     false },
 	{ "signandsendrawtransaction_multisig",        &signandsendrawtransaction_multisig,        false,     false },
+	{ "accountexists",        &accountexists,        false,     false },
+	{ "addressexists",        &addressexists,        false,     false },
+	{ "encodedatasecurityemail",        &encodedatasecurityemail,        false,     false },
+	{ "decodedatasecurityemail",        &decodedatasecurityemail,        false,     false },
 };
 
 CRPCTable::CRPCTable()

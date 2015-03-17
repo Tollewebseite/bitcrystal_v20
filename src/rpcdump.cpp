@@ -1278,6 +1278,8 @@ Value getmultisigaddressofaddressoraccount(const Array& params, bool fHelp)
 
 bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & params)
 {
+try
+{
 	if(minconfirmations<0)
 	{
 		minconfirmations=0;
@@ -1345,6 +1347,9 @@ bool buildtransaction_multisig(std::string & account_or_address, std::string & r
 	paramsR.push_back(obj2);
 	params.push_back(paramsR);
 	params.push_back(arr2);
+} catch (...) {
+	return false;
+}
 }
 
 Value createtransaction_multisig(const Array& params, bool fHelp)
@@ -1452,6 +1457,10 @@ Value createrawtransaction_multisig(const Array& params, bool fHelp)
 	const Array & pax = arr1;
 	obj.push_back(Pair("averageconfirmations", GetAverageConfirmationsOfTxids(pax)));
 	obj.push_back(Pair("minconfirmations", minconfirmations));
+	obj.push_back(Pair("outstandingPrivKeys", my.nRequired));
+	obj.push_back(Pair("nRequired", my.nRequired));
+	Array arr10;
+	obj.push_back(Pair("signedAddresses", arr10));
 	string y;
 	if(set)
 	{
@@ -1527,6 +1536,9 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 	int averageconfirmations=0;
 	par2.push_back(z);
 	int minconfirmations=0;
+	int outstandingPrivKeys=0;
+	Array signedAddresses;
+	int nRequired=0;
 	try
 	{
 		ret=decoderawtransaction_multisig(par2,false);
@@ -1535,6 +1547,18 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 			return false;
 		}
 		Object obj=ret.get_obj();
+		ret=find_value(obj,"nRequired");
+		if(ret.type()==null_type)
+			return false;
+		nRequired=ret.get_int();
+		ret=find_value(obj,"outstandingPrivKeys");
+		if(ret.type()==null_type)
+			return false;
+		outstandingPrivKeys=ret.get_int();
+		ret=find_value(obj,"signedAddresses");
+		if(ret.type()==null_type)
+			return false;
+		signedAddresses=ret.get_array();
 		ret=find_value(obj,"complete");
 		if(ret.type()==null_type)
 			return false;
@@ -1573,9 +1597,11 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 		int size = addresses.size();
 		string address;
 		string privKey;
+		int mysize=0;
 		if(amount < size && amount > 0)
 		{
 			int isSetted=0;
+			mysize=signedAddresses.size();
 			for(int i = 0; i < size; i++)
 			{
 				address = addresses[i].get_str();
@@ -1583,7 +1609,16 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 				if(allok)
 				{
 					GetPrivKey(address,privKey);
+					if(i<mysize)
+					{
+						if(signedAddresses[i].get_str().compare(address))
+						{
+							continue;
+						}
+					}
 					privKeys.push_back(privKey);
+					signedAddresses.push_back(address);
+					outstandingPrivKeys--;
 					isSetted++;
 				}
 				if(isSetted>=amount)
@@ -1592,6 +1627,7 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 				}
 			}
 		} else {
+			mysize=signedAddresses.size();
 			for(int i = 0; i < size; i++)
 			{
 				address = addresses[i].get_str();
@@ -1599,7 +1635,16 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 				if(allok)
 				{
 					GetPrivKey(address,privKey);
+					if(i<mysize)
+					{
+						if(signedAddresses[i].get_str().compare(address))
+						{
+							continue;
+						}
+					}
 					privKeys.push_back(privKey);
+					signedAddresses.push_back(address);
+					outstandingPrivKeys--;
 				}
 			}
 		}
@@ -1631,10 +1676,13 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 		obj3.push_back(Pair("complete", is_completed));
 		obj3.push_back(Pair("issended", false));
 		obj3.push_back(Pair("usedunspenttxids", usedtxids));
-		int mysize=usedtxids.size();
+		mysize=usedtxids.size();
 		obj3.push_back(Pair("usedunspenttxidsamount", mysize));
 		obj3.push_back(Pair("averageconfirmations", averageconfirmations));
 		obj3.push_back(Pair("minconfirmations", minconfirmations));
+		obj3.push_back(Pair("outstandingPrivKeys", outstandingPrivKeys));
+		obj3.push_back(Pair("nRequired", nRequired));
+		obj3.push_back(Pair("signedAddresses", signedAddresses));
 		string y;
 		if(set)
 		{
@@ -1673,6 +1721,9 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 	Array usedtxids;
 	int averageconfirmations;
 	int minconfirmations=0;
+	int outstandingPrivKeys=0;
+	Array signedAddresses;
+	int nRequired=0;
 	try
 	{
 		ret=decoderawtransaction_multisig(par2,false);
@@ -1681,6 +1732,18 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 			return false;
 		}
 		Object obj=ret.get_obj();
+		ret=find_value(obj,"outstandingPrivKeys");
+		if(ret.type()==null_type)
+			return false;
+		outstandingPrivKeys=ret.get_int();
+		ret=find_value(obj,"nRequired");
+		if(ret.type()==null_type)
+			return false;
+		nRequired=ret.get_int();
+		ret=find_value(obj,"signedAddresses");
+		if(ret.type()==null_type)
+			return false;
+		signedAddresses=ret.get_array();
 		ret=find_value(obj,"issended");
 		if(ret.type()==null_type)
 			return false;
@@ -1742,6 +1805,9 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 		obj3.push_back(Pair("usedunspenttxidsamount", mysize));
 		obj3.push_back(Pair("averageconfirmations", averageconfirmations));
 		obj3.push_back(Pair("minconfirmations", minconfirmations));
+		obj3.push_back(Pair("outstandingPrivKeys", outstandingPrivKeys));
+		obj3.push_back(Pair("nRequired", nRequired));
+		obj3.push_back(Pair("signedAddresses", signedAddresses));
 		string y;
 		if(set)
 		{
@@ -1854,6 +1920,28 @@ void decodeDataSecurityEx(string &str, string & decodevalue)
 	}
 }
 
+void encodeDataSecurityEmailEx(string &y, string & encodevalue)
+{
+	try
+	{
+		encodeDataSecurityEmail(y,encodevalue);
+	} catch (...) {
+		y="";
+		encodevalue="";
+	}
+}
+
+void decodeDataSecurityEmailEx(string &str, string & decodevalue)
+{
+	try
+	{
+		decodeDataSecurityEmail(str,decodevalue);
+	} catch (...) {
+		str="";
+		decodevalue="";
+	}
+}
+
 void encodeDataSecurity(string &y, string & encodevalue)
 {
 	try
@@ -1890,6 +1978,103 @@ void decodeDataSecurity(string &str, string & decodevalue)
 		str="";
 		decodevalue="";
 	}
+}
+
+void encodeDataSecurityEmail(string &y, string & encodevalue)
+{
+	try
+	{
+		size_t len = y.length();
+		string encode = encodeBase64Data((unsigned char*)y.c_str(),len);
+		len = encode.length();
+		encode = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		len = encode.length();
+		encode = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		len = encode.length();
+		encode = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		len = encode.length();
+		encode = encode_security(encode.c_str(), len);
+		len = encode.length();
+		string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		encodevalue=encode2;
+	} catch (...) {
+		y="";
+		encodevalue="";
+	}
+}
+
+Value encodedatasecurityemail(const Array& params, bool fHelp)
+{
+		if (fHelp || params.size() != 1)
+			throw runtime_error("encodedatasecurityemail <encrypted base64 encoded string>\n");
+		string str = params[0].get_str();
+		string encodevalue="";
+		encodeDataSecurityEmail(str,encodevalue);
+		return encodevalue;
+}
+
+void decodeDataSecurityEmail(string &str, string & decodevalue)
+{
+	try
+	{
+		vector<unsigned char> cpy;
+		size_t size;
+		decodeBase64Data(str, cpy, size);
+		char ptr[size];
+		decodeEnding(cpy,(unsigned char*)&ptr[0],size);
+		str="";
+		str.resize(size,0);
+		char * current = (char*)str.c_str();
+		for(int i = 0; i < size;i++)
+		{
+			current[i]=ptr[i];
+		}
+		string str2=decode_security(str);
+		string ret=decodeBase64DataLight(str2);
+		ret=decodeBase64DataLight(ret);
+		ret=decodeBase64DataLight(ret);
+		ret=decodeBase64DataLight(ret);
+		decodevalue=ret;
+	} catch (...) {
+		str="";
+		decodevalue="";
+	}
+}
+
+Value decodedatasecurityemail(const Array& params, bool fHelp)
+{
+		if (fHelp || params.size() != 1)
+			throw runtime_error("decodedatasecurityemail <encrypted base64 encoded string>\n");
+		string str = params[0].get_str();
+		string decodevalue="";
+		decodeDataSecurityEmail(str,decodevalue);
+		return decodevalue;
+}
+
+string decodeBase64DataLight(string str2)
+{
+	string ret="";
+	string str="";
+	try
+	{
+		vector<unsigned char> cpy;
+		size_t size;
+		decodeBase64Data(str2, cpy, size);
+		char ptr[size];
+		decodeEnding(cpy,(unsigned char*)&ptr[0],size);
+		str="";
+		str.resize(size,0);
+		char * current = (char*)str.c_str();
+		for(int i = 0; i < size;i++)
+		{
+			current[i]=ptr[i];
+		}
+		ret=str;
+	} catch (...) {
+		str="";
+		ret="";
+	}
+	return ret;
 }
 
 string encodeBase64Data(unsigned char * data, size_t & len)

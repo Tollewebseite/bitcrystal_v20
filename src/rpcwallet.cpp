@@ -193,6 +193,62 @@ bool hasRedeemScript(string address)
 	}
 }
 
+bool accountExists(std::string & account)
+{
+    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& item, pwalletMain->mapAddressBook)
+    {
+        const CBitcoinAddress& address = item.first;
+        const string& strName = item.second;
+		if(account.compare(strName) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+Value accountexists(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "accountexists <account>\n"
+            "Returns true if accounts exist otherwise false");
+
+    // Parse the account first so we don't generate a key if there's an error
+    string strAccount = AccountFromValue(params[0]);
+
+    return accountExists(strAccount);
+}
+
+bool addressExists(std::string & addr)
+{
+	string str = "";
+    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& item, pwalletMain->mapAddressBook)
+    {
+        const CBitcoinAddress& address = item.first;
+        const string& strName = item.second;
+		str = address.ToString();
+		if(str.compare(addr) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+Value addressexists(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "addressexists <address>\n"
+            "Returns true if address exist otherwise false");
+
+    // Parse the account first so we don't generate a key if there's an error
+    string strAddress = params[0].get_str();
+
+    return addressExists(strAddress);
+}
+
 bool GetMultisigAddresses(vector<my_multisigaddress> & my_multisigaddresses)
 {
 	bool allok=false;
