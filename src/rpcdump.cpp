@@ -2003,6 +2003,469 @@ void encodeDataSecurityEmail(string &y, string & encodevalue)
 	}
 }
 
+void encodeDataSecurityEmailHash(string &y, string & encodevalue)
+{
+	try
+	{
+		string ret="";
+		encodeDataSecurityEmail(y, ret);
+		size_t len = ret.length();
+		string t="";
+		for(int i = 0; i < len; i++)
+		{
+			switch(ret.at(i))
+			{
+				case '0': 
+				{
+					t+="000000bc13facd0ff483e484ee7e0fb4d658f47cd59e0d9a99b3ed1c83253c46";
+				}
+				break;
+				case '1': 
+				{
+					t+="0000006b6dd69913a3baa44246caa7ba1173121d546ae92a14bb57c438eff89c";
+				}
+				break;
+				case '2': 
+				{
+					t+="0000000fa03d900cc979e333d668b09ff0fd414334721107dcb197fe10ea5a78";
+				}
+				break;
+				case '3': 
+				{
+					t+="000000b2e856412179eb59cedcd36e5e2326335a596a445c36ccbe4241a76bdf";
+				}
+				break;
+				case '4': 
+				{
+					t+="000000022334e084b9130b06e7ec3764e895b9ddf0172fdacdae43b12f9c6136";
+				}
+				break;
+				case '5': 
+				{
+					t+="0000002d815c2aa45450bf504f56b06ab12d3a3b55f631b5870abf131b342aff";
+				}
+				break;
+				case '6': 
+				{
+					t+="0000009c1b9fb3352b9622ee70bd1e6bbffa6f55c6cedc08a010905ebbf009dc";
+				}
+				break;
+				case '7': 
+				{
+					t+="0000001a24fe761f0dda385156e5b4fe47cdb0a3ccecfd1859f988260fb734ae";
+				}
+				break;
+				case '8': 
+				{
+					t+="00000092dd45f39d16f233267b9c7ebfa092689aa0012a206720797a0d587bf1";
+				}
+				break;
+				case '9': 
+				{
+					t+="00000020392ba932bab3066400c273279007355e1e4ddc08948ac3b7a4499ed5";
+				}
+				break;
+				case '.': 
+				{
+					t+="00000045ccc678fbe64f2074ba52baaf19133cfd2c8f961c8f9639b9c01950ad";
+				}
+				break;
+				case ';': 
+				{
+					t+="000000e7f19e975efe6b2923ed96f5a9fe5991b1733393c36308b2b82ba19cc0";
+				}
+				break;
+				case '!': 
+				{
+					t+="000000c11ddedd753455e18746a845527bca59c4133bc501cb05755bc6e5d41d";
+				}
+				break;
+				case '?': 
+				{
+					t+="00000029cd44fe4f2a03a9588972785692aec3b3abbfa43b87af9c9fda74499f";
+				}
+				break;
+				case '$': 
+				{
+					t+="000000ccd5b8b7ec969916d75148825cf677cd19e4e67d0cb918d5febef2cb13";
+				}
+				break;
+				case 'A': 
+				{
+					t+="0000005f62b8676a3ad6af87d327bb7058ec288b98aba2e0e8bda2dde3078173";
+				}
+				break;
+				case 'B': 
+				{
+					t+="000000b257bb5bf7911d37cb8f1c8ed740ae44d9cfca3a53c9992f5544a2afb5";
+				}
+				break;
+				case 'C': 
+				{
+					t+="000000e8759a7325aa771ae7884d30f5e24f721b7d3fe81b25b379645c3b1e77";
+				}
+				break;
+				case 'D': 
+				{
+					t+="000000e358dc10690199e14e740a07c5cc25d1a3a1033bc22bd7eeb8933cc6a8";
+				}
+				break;
+				case 'E': 
+				{
+					t+="000000ef2a7f435782193ee8dea723efda2da27e244035bb45409537b459b312";
+				}
+				break;
+				case 'F': 
+				{
+					t+="000000a4611542396a3c997a1ed5ecdab3b732fe2b59a76d03406ccf28c7a78f";
+				}
+				break;
+				case 'G': 
+				{
+					t+="00000088114dc21118b779bde7147fbfb39bb35821c50c5c04203908da360429";
+				}
+				break;
+				case 'H': 
+				{
+					t+="00000004ba1064db92c95df383f3a14b08b64f86c95f1d14eaaa6fa5083cd3aa";
+				}
+				break;
+				case 'I': 
+				{
+					t+="000000884aebf477346484e4f9b0b0723d0138b4fcaa933f45a7ca6832b2cfdc";
+				}
+				break;
+				case 'J': 
+				{
+					t+="00000061aa985dd8ca16abf89a21261001209289f42a21f436ee8e292c448946";
+				}
+				break;
+				case 'K': 
+				{
+					t+="0000000bfa8ff2fa43a86f76bd81499b85b20761d4ed2b21085f513b3fc4bc1d";
+				}
+				break;
+				case 'L': 
+				{
+					t+="0000001d31f7d2d459f1a332045c57004417845a68b56613b0b458dbf58fff34";
+				}
+				break;
+				case 'M': 
+				{
+					t+="000000289a52751253722a5ef90eb94f085ac6c478f3094754831370107aa9e9";
+				}
+				break;
+				case 'N': 
+				{
+					t+="000000e906111324edc2783c02025c42fa74b473558a1db574ac4b70395b0a6b";
+				}
+				break;
+				case 'O': 
+				{
+					t+="0000000b8d7b3b5098ca418dd3147e6b60006da562c43fdb888fec52e18ffbfd";
+				}
+				break;
+				case 'P': 
+				{
+					t+="0000007f15d4bc1b9881921e7207a1f6fdf44251310a299fc86f3900570a1841";
+				}
+				break;
+				case 'Q': 
+				{
+					t+="0000003766e0de06191a3e19977fb06accc8de7e0bf5cc910942ab87b36b24a7";
+				}
+				break;
+				case 'R': 
+				{
+					t+="0000001fd79e5f5e7a79ece6b855c388ba3f81253b64bf2c73ef60b83dddea8e";
+				}
+				break;
+				case 'S': 
+				{
+					t+="0000004b8c90670771b83da1d1626bbc60063a4f0e9c659aefdcde445571c233";
+				}
+				break;
+				case 'T': 
+				{
+					t+="000000c81520530a140701dbb1fd290511bd41b5d37bb9f3bc5b2d4a44f5c5f1";
+				}
+				break;
+				case 'U': 
+				{
+					t+="000000e654480d946831a9e7836cc8a94f29d6f4a35a9bafdbda3611862e4424";
+				}
+				break;
+				case 'V': 
+				{
+					t+="000000e469f1dce9484e92c49291eb2f3bc5cdc167dce9d6daf1fda3036f7921";
+				}
+				break;
+				case 'W': 
+				{
+					t+="0000004f2b9f5cd3a12e99ca8fefb7cbab6ab883b4053d4671ecb4acbbff506f";
+				}
+				break;
+				case 'X': 
+				{
+					t+="00000017fb7497e67bb27b33fc78936af20678cb1b1526f82186e14811cc0a18";
+				}
+				break;
+				case 'Y': 
+				{
+					t+="00000072576daea2462347b3667ad30f20107d004ba4b2b51ca193fde8d6dbae";
+				}
+				break;
+				case 'Z': 
+				{
+					t+="00000045483b70f3aba766bc0316f582552a31933d2af740d07bf51eba8d3f74";
+				}
+				break;
+				case 'a': 
+				{
+					t+="0000008a623d436626d9dc30ac07649cc4616c0ccd5c4d52364f5b0104d67ad8";
+				}
+				break;
+				case 'b': 
+				{
+					t+="000000dc682cba62616e9cb5a26cd3143a8410e01db24a0389ebbdd164d6c261";
+				}
+				break;
+				case 'c': 
+				{
+					t+="000000374227dd4bf4fce3f00750a5c3df8598dfa41408d74578c289445260d2";
+				}
+				break;
+				case 'd': 
+				{
+					t+="0000008a9a1174c733b72953e174e69fa3170c87ba3c5e51386c1457f173d7e2";
+				}
+				break;
+				case 'e': 
+				{
+					t+="00000000b2517da2257d6fc7904e472a6a0d5807333d39b201aec4ebf1d7c615";
+				}
+				break;
+				case 'f': 
+				{
+					t+="0000002be1048de356aee19881be1b58fa7ee656872677eb963cfa5b4e38fe73";
+				}
+				break;
+				case 'g': 
+				{
+					t+="000000ab7bfab78d2303bf4c250589e21601cc643218fb60fe23e518dcb3dcf0";
+				}
+				break;
+				case 'h': 
+				{
+					t+="00000068dcb194d7deae33eca99459cd6e520a405d436e4115cda1e9f6bcf5ed";
+				}
+				break;
+				case 'i': 
+				{
+					t+="000000298ae85bccdac86daeca16091e11d84f12206eb91e758d08753a19d6ae";
+				}
+				break;
+				case 'j': 
+				{
+					t+="000000e2bdc746bf35962cffae2b61ff8ba0b7e32ea6a4e3bc143abedcb8b9cb";
+				}
+				break;
+				case 'k': 
+				{
+					t+="000000b2534d86e881786e70dfe6d4155bb7d1b305d665a50395c23c44c5ae90";
+				}
+				break;
+				case 'l': 
+				{
+					t+="000000bda72a1f71acab63a57e30e61e6d32a05f8ff27611c06e2e667fdf9958";
+				}
+				break;
+				case 'm': 
+				{
+					t+="000000f2e57484e82b51deb5d865b2e5ddb5f2cf5963c8628815a33cda49230c";
+				}
+				break;
+				case 'n': 
+				{
+					t+="000000f51fd09f79cd4ee9068c52df9d9e3116f9710087b679d71e493f5c0e77";
+				}
+				break;
+				case 'o': 
+				{
+					t+="0000000438662150a862d888ffed689e1a0b7284943b954369a256a159253db8";
+				}
+				break;
+				case 'p': 
+				{
+					t+="0000009a213e02fe42b47f1f1178a781ba6726e9e7dc28bff59d47d74a15a45d";
+				}
+				break;
+				case 'q': 
+				{
+					t+="0000005ce7bed97dc5eca5573a908562038e186fc9ab1063d9c076042c8ac2a3";
+				}
+				break;
+				case 'r': 
+				{
+					t+="00000076fbd1cdc608e019b574543e7ec08570cf8925bd5155d1c505eeed2929";
+				}
+				break;
+				case 's': 
+				{
+					t+="000000b6e0991623387ee7b7851c65a92649ed2595b96eaf1f148e34a4570555";
+				}
+				break;
+				case 't': 
+				{
+					t+="000000f72e46055ecaa5332695062d0795266f418759581166e9841307ef8e5c";
+				}
+				break;
+				case 'u': 
+				{
+					t+="0000008a08888b9c19f6ea1cee17e14d206a8b767847dd12035bab651c58f086";
+				}
+				break;
+				case 'v': 
+				{
+					t+="000000b88c68ec786362607f1d6324ab71987c238c051cbe134124a551cdb0ff";
+				}
+				break;
+				case 'w': 
+				{
+					t+="000000af044d896b6cadff3398c74b8c54aaf7454325ce3269f7957cde467212";
+				}
+				break;
+				case 'x': 
+				{
+					t+="000000c5248cf04af68ef1bcd262d4fbeb0a562169f6c68b4f76edbae87dcc20";
+				}
+				break;
+				case 'y': 
+				{
+					t+="00000037fd9533ae63942844eb35155fa0fb6c11b193b7582f35e404dc92d637";
+				}
+				break;
+				case 'z': 
+				{
+					t+="0000002db3b3872a398d8dc05e721071fcab383eec6caeaf3502709e36a36a24";
+				}
+				break;
+			}
+		}
+		encodeDataSecurityEmail(t, encodevalue);
+	} catch (...) {
+		y="";
+		encodevalue="";
+	}
+}
+
+Value encodedatasecurityemailhash(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+			throw runtime_error("encodedatasecurityemailhash <encrypted base64 encoded string>\n");
+		string str = params[0].get_str();
+		string encodevalue="";
+		encodeDataSecurityEmailHash(str,encodevalue);
+		return encodevalue;
+}
+
+void decodeDataSecurityEmailHash(string &y, string & decodevalue)
+{
+		string decode2="";
+		decodeDataSecurityEmail(y,decode2);
+		str_replace(decode2,"000000bc13facd0ff483e484ee7e0fb4d658f47cd59e0d9a99b3ed1c83253c46","0");
+		str_replace(decode2,"0000006b6dd69913a3baa44246caa7ba1173121d546ae92a14bb57c438eff89c","1");
+		str_replace(decode2,"0000000fa03d900cc979e333d668b09ff0fd414334721107dcb197fe10ea5a78","2");
+		str_replace(decode2,"000000b2e856412179eb59cedcd36e5e2326335a596a445c36ccbe4241a76bdf","3");
+		str_replace(decode2,"000000022334e084b9130b06e7ec3764e895b9ddf0172fdacdae43b12f9c6136","4");
+		str_replace(decode2,"0000002d815c2aa45450bf504f56b06ab12d3a3b55f631b5870abf131b342aff","5");
+		str_replace(decode2,"0000009c1b9fb3352b9622ee70bd1e6bbffa6f55c6cedc08a010905ebbf009dc","6");
+		str_replace(decode2,"0000001a24fe761f0dda385156e5b4fe47cdb0a3ccecfd1859f988260fb734ae","7");
+		str_replace(decode2,"00000092dd45f39d16f233267b9c7ebfa092689aa0012a206720797a0d587bf1","8");
+		str_replace(decode2,"00000020392ba932bab3066400c273279007355e1e4ddc08948ac3b7a4499ed5","9");
+		str_replace(decode2,"0000001f6fee4d78a802498141c6689d7c9074def17eb5fed1678cad71cedb91",",");
+		str_replace(decode2,"000000e7f19e975efe6b2923ed96f5a9fe5991b1733393c36308b2b82ba19cc0",";");
+		str_replace(decode2,"000000c11ddedd753455e18746a845527bca59c4133bc501cb05755bc6e5d41d","!");
+		str_replace(decode2,"00000029cd44fe4f2a03a9588972785692aec3b3abbfa43b87af9c9fda74499f","?");
+		str_replace(decode2,"000000ccd5b8b7ec969916d75148825cf677cd19e4e67d0cb918d5febef2cb13","$");
+		str_replace(decode2,"00000045ccc678fbe64f2074ba52baaf19133cfd2c8f961c8f9639b9c01950ad",".");
+		str_replace(decode2,"0000005f62b8676a3ad6af87d327bb7058ec288b98aba2e0e8bda2dde3078173","A");
+		str_replace(decode2,"000000b257bb5bf7911d37cb8f1c8ed740ae44d9cfca3a53c9992f5544a2afb5","B");
+		str_replace(decode2,"000000e8759a7325aa771ae7884d30f5e24f721b7d3fe81b25b379645c3b1e77","C");
+		str_replace(decode2,"000000e358dc10690199e14e740a07c5cc25d1a3a1033bc22bd7eeb8933cc6a8","D");
+		str_replace(decode2,"000000ef2a7f435782193ee8dea723efda2da27e244035bb45409537b459b312","E");
+		str_replace(decode2,"000000a4611542396a3c997a1ed5ecdab3b732fe2b59a76d03406ccf28c7a78f","F");
+		str_replace(decode2,"00000088114dc21118b779bde7147fbfb39bb35821c50c5c04203908da360429","G");
+		str_replace(decode2,"00000004ba1064db92c95df383f3a14b08b64f86c95f1d14eaaa6fa5083cd3aa","H");
+		str_replace(decode2,"000000884aebf477346484e4f9b0b0723d0138b4fcaa933f45a7ca6832b2cfdc","I");
+		str_replace(decode2,"00000061aa985dd8ca16abf89a21261001209289f42a21f436ee8e292c448946","J");
+		str_replace(decode2,"0000000bfa8ff2fa43a86f76bd81499b85b20761d4ed2b21085f513b3fc4bc1d","K");
+		str_replace(decode2,"0000001d31f7d2d459f1a332045c57004417845a68b56613b0b458dbf58fff34","L");
+		str_replace(decode2,"000000289a52751253722a5ef90eb94f085ac6c478f3094754831370107aa9e9","M");
+		str_replace(decode2,"000000e906111324edc2783c02025c42fa74b473558a1db574ac4b70395b0a6b","N");
+		str_replace(decode2,"0000000b8d7b3b5098ca418dd3147e6b60006da562c43fdb888fec52e18ffbfd","O");
+		str_replace(decode2,"0000007f15d4bc1b9881921e7207a1f6fdf44251310a299fc86f3900570a1841","P");
+		str_replace(decode2,"0000003766e0de06191a3e19977fb06accc8de7e0bf5cc910942ab87b36b24a7","Q");
+		str_replace(decode2,"0000001fd79e5f5e7a79ece6b855c388ba3f81253b64bf2c73ef60b83dddea8e","R");
+		str_replace(decode2,"0000004b8c90670771b83da1d1626bbc60063a4f0e9c659aefdcde445571c233","S");
+		str_replace(decode2,"000000c81520530a140701dbb1fd290511bd41b5d37bb9f3bc5b2d4a44f5c5f1","T");
+		str_replace(decode2,"000000e654480d946831a9e7836cc8a94f29d6f4a35a9bafdbda3611862e4424","U");
+		str_replace(decode2,"000000e469f1dce9484e92c49291eb2f3bc5cdc167dce9d6daf1fda3036f7921","V");
+		str_replace(decode2,"0000004f2b9f5cd3a12e99ca8fefb7cbab6ab883b4053d4671ecb4acbbff506f","W");
+		str_replace(decode2,"00000017fb7497e67bb27b33fc78936af20678cb1b1526f82186e14811cc0a18","X");
+		str_replace(decode2,"00000072576daea2462347b3667ad30f20107d004ba4b2b51ca193fde8d6dbae","Y");
+		str_replace(decode2,"00000045483b70f3aba766bc0316f582552a31933d2af740d07bf51eba8d3f74","Z");
+		str_replace(decode2,"0000008a623d436626d9dc30ac07649cc4616c0ccd5c4d52364f5b0104d67ad8","a");
+		str_replace(decode2,"000000dc682cba62616e9cb5a26cd3143a8410e01db24a0389ebbdd164d6c261","b");
+		str_replace(decode2,"000000374227dd4bf4fce3f00750a5c3df8598dfa41408d74578c289445260d2","c");
+		str_replace(decode2,"0000008a9a1174c733b72953e174e69fa3170c87ba3c5e51386c1457f173d7e2","d");
+		str_replace(decode2,"00000000b2517da2257d6fc7904e472a6a0d5807333d39b201aec4ebf1d7c615","e");
+		str_replace(decode2,"0000002be1048de356aee19881be1b58fa7ee656872677eb963cfa5b4e38fe73","f");
+		str_replace(decode2,"000000ab7bfab78d2303bf4c250589e21601cc643218fb60fe23e518dcb3dcf0","g");
+		str_replace(decode2,"00000068dcb194d7deae33eca99459cd6e520a405d436e4115cda1e9f6bcf5ed","h");
+		str_replace(decode2,"000000298ae85bccdac86daeca16091e11d84f12206eb91e758d08753a19d6ae","i");
+		str_replace(decode2,"000000e2bdc746bf35962cffae2b61ff8ba0b7e32ea6a4e3bc143abedcb8b9cb","j");
+		str_replace(decode2,"000000b2534d86e881786e70dfe6d4155bb7d1b305d665a50395c23c44c5ae90","k");
+		str_replace(decode2,"000000bda72a1f71acab63a57e30e61e6d32a05f8ff27611c06e2e667fdf9958","l");
+		str_replace(decode2,"000000f2e57484e82b51deb5d865b2e5ddb5f2cf5963c8628815a33cda49230c","m");
+		str_replace(decode2,"000000f51fd09f79cd4ee9068c52df9d9e3116f9710087b679d71e493f5c0e77","n");
+		str_replace(decode2,"0000000438662150a862d888ffed689e1a0b7284943b954369a256a159253db8","o");
+		str_replace(decode2,"0000009a213e02fe42b47f1f1178a781ba6726e9e7dc28bff59d47d74a15a45d","p");
+		str_replace(decode2,"0000005ce7bed97dc5eca5573a908562038e186fc9ab1063d9c076042c8ac2a3","q");
+		str_replace(decode2,"00000076fbd1cdc608e019b574543e7ec08570cf8925bd5155d1c505eeed2929","r");
+		str_replace(decode2,"000000b6e0991623387ee7b7851c65a92649ed2595b96eaf1f148e34a4570555","s");
+		str_replace(decode2,"000000f72e46055ecaa5332695062d0795266f418759581166e9841307ef8e5c","t");
+		str_replace(decode2,"0000008a08888b9c19f6ea1cee17e14d206a8b767847dd12035bab651c58f086","u");
+		str_replace(decode2,"000000b88c68ec786362607f1d6324ab71987c238c051cbe134124a551cdb0ff","v");
+		str_replace(decode2,"000000af044d896b6cadff3398c74b8c54aaf7454325ce3269f7957cde467212","w");
+		str_replace(decode2,"000000c5248cf04af68ef1bcd262d4fbeb0a562169f6c68b4f76edbae87dcc20","x");
+		str_replace(decode2,"00000037fd9533ae63942844eb35155fa0fb6c11b193b7582f35e404dc92d637","y");
+		str_replace(decode2,"0000002db3b3872a398d8dc05e721071fcab383eec6caeaf3502709e36a36a24","z");
+		decodeDataSecurityEmail(decode2,decodevalue);
+}
+
+Value decodedatasecurityemailhash(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+			throw runtime_error("decodedatasecurityemailhash <encrypted base64 encoded string>\n");
+		string str = params[0].get_str();
+		string decodevalue="";
+		decodeDataSecurityEmailHash(str,decodevalue);
+		return decodevalue;
+}
+
+ void str_replace( string &s, const string &search, const string &replace ) 
+ {
+      for( size_t pos = 0; ; pos += replace.length() ) 
+	{
+          pos = s.find( search, pos );
+         if( pos == string::npos ) break;
+ 
+        s.erase( pos, search.length() );
+         s.insert( pos, replace );
+     }
+}
+
 Value encodedatasecurityemail(const Array& params, bool fHelp)
 {
 		if (fHelp || params.size() != 1)

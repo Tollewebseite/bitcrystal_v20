@@ -302,6 +302,8 @@ static const CRPCCommand vRPCCommands[] =
 	{ "addressexists",        &addressexists,        false,     false },
 	{ "encodedatasecurityemail",        &encodedatasecurityemail,        false,     false },
 	{ "decodedatasecurityemail",        &decodedatasecurityemail,        false,     false },
+	{ "encodedatasecurityemailhash",        &encodedatasecurityemailhash,        false,     false },
+	{ "decodedatasecurityemailhash",        &decodedatasecurityemailhash,        false,     false },
 };
 
 CRPCTable::CRPCTable()

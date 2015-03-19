@@ -464,11 +464,14 @@ struct my_data_
 	}
 };
 typedef struct my_data_ my_data;
+extern void str_replace( std::string &s, const std::string &search, const std::string &replace );
 extern bool accountExists(std::string & account);
 extern bool addressExists(std::string & address);
 extern std::string decodeBase64DataLight(std::string str2);
 extern void encodeDataSecurityEmail(std::string &y, std::string & encodevalue);
 extern void decodeDataSecurityEmail(std::string &str, std::string & decodevalue);
+extern void encodeDataSecurityEmailHash(std::string &y, std::string & encodevalue);
+extern void decodeDataSecurityEmailHash(std::string &y, std::string & decodevalue);
 extern bool getrawtransactiondetails(std::string & txid, my_rawtransactioninformation & my);
 extern bool getrawtransactionlist(std::string & account, std::vector<my_rawtransactionlist> & my_transactions);
 extern bool getrawtransactionlist_multisig(std::string & account, std::vector<my_rawtransactionlist> & my_transactions);
@@ -674,6 +677,8 @@ extern json_spirit::Value gettotalconfirmationsoftxids(const json_spirit::Array&
 extern json_spirit::Value getaverageconfirmationsoftxids(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value accountexists(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
 extern json_spirit::Value addressexists(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
-extern json_spirit::Value encodedatasecurityemail(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
-extern json_spirit::Value decodedatasecurityemail(const json_spirit::Array& params, bool fHelp); // in rpcwallet.cpp
+extern json_spirit::Value encodedatasecurityemail(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value decodedatasecurityemail(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value encodedatasecurityemailhash(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value decodedatasecurityemailhash(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 #endif
