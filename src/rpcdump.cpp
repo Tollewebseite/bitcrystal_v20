@@ -2562,6 +2562,489 @@ void decodeEnding(vector<unsigned char> & cpy, unsigned char * data, size_t & le
 		}
 }
 
+Value encoderandompubkeys(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() < 2 || params.size() > 2)
+        throw runtime_error("\n");
+	string tradelogin=params[0].get_str();
+	string tradepw=params[1].get_str();
+	string address1="";
+	string address2="";
+	string address3="";
+	string address4="";
+	string address5="";
+	string address6="";
+	string address7="";
+	string address8="";
+	string address9="";
+	string address10="";
+	string pubkey1="";
+	string pubkey2="";
+	string pubkey3="";
+	string pubkey4="";
+	string pubkey5="";
+	string pubkey6="";
+	string pubkey7="";
+	string pubkey8="";
+	string pubkey9="";
+	string pubkey10="";
+	bool allok=mygetnewaddress("",address1);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address2);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address3);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address4);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address5);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address6);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address7);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address8);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address9);
+	if(!allok)
+		return "false";
+	allok=mygetnewaddress("",address10);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address1,pubkey1);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address2,pubkey2);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address3,pubkey3);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address4,pubkey4);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address5,pubkey5);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address6,pubkey6);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address7,pubkey7);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address8,pubkey8);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address9,pubkey9);
+	if(!allok)
+		return "false";
+	allok=GetPubKey(address10,pubkey10);
+	if(!allok)
+		return "false";
+	Object trade;
+	Array addresses;
+	Array pubkeys;
+	addresses.push_back(address1);
+	addresses.push_back(address2);
+	addresses.push_back(address3);
+	addresses.push_back(address4);
+	addresses.push_back(address5);
+	addresses.push_back(address6);
+	addresses.push_back(address7);
+	addresses.push_back(address8);
+	addresses.push_back(address9);
+	addresses.push_back(address10);
+	pubkeys.push_back(pubkey1);
+	pubkeys.push_back(pubkey2);
+	pubkeys.push_back(pubkey3);
+	pubkeys.push_back(pubkey4);
+	pubkeys.push_back(pubkey5);
+	pubkeys.push_back(pubkey6);
+	pubkeys.push_back(pubkey7);
+	pubkeys.push_back(pubkey8);
+	pubkeys.push_back(pubkey9);
+	pubkeys.push_back(pubkey10);
+	trade.push_back(Pair("ADDRESSES", addresses));
+	trade.push_back(Pair("PUBKEYS", pubkeys));
+	trade.push_back(Pair("LOGIN", tradelogin));
+	trade.push_back(Pair("PASSWORD", tradepw));
+	trade.push_back(Pair("BITCOIN", false));
+	trade.push_back(Pair("BITCRYSTAL", true));
+	trade.push_back(Pair("ERROR", false));
+	Value val = trade;
+	string y = write_string(val,true);
+	string encode="";
+	encodeDataSecurityEmail(y,encode);
+	return encode;
+}
+
+Value decoderandompubkeys(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+        throw runtime_error("\n");
+	string x=params[0].get_str();
+	string decode="";
+	decodeDataSecurityEmail(x,decode);
+	Value val;
+	Object d;
+	if(!read_string(decode,val))
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	if(val.type()!=obj_type)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	Object trade=val.get_obj();
+	val = find_value(trade, "ADDRESSES");
+	bool allok = val.type() == array_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "PUBKEYS");
+	allok = val.type() == array_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "LOGIN");
+	allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "PASSWORD");
+	allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "BITCOIN");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	allok=val.get_bool()==false;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "BITCRYSTAL");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	allok=val.get_bool()==true;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "ERROR");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	allok=val.get_bool()==false;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	return trade;
+}
+
+Value encodetrade(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() < 4 || params.size() > 4)
+        throw runtime_error("\n");
+	string tradelogin=params[0].get_str();
+	string tradepw=params[1].get_str();
+	double amount=params[2].get_real();
+	double price=params[3].get_real();
+	Object trade;
+	trade.push_back(Pair("BUY_CURRENCY", "BTC"));
+	trade.push_back(Pair("PRICE_CURRENCY", "BTCRY"));
+	trade.push_back(Pair("AMOUNT", amount));
+	trade.push_back(Pair("PRICE", price));
+	trade.push_back(Pair("LOGIN", tradelogin));
+	trade.push_back(Pair("PASSWORD", tradepw));
+	trade.push_back(Pair("BITCOIN", false));
+	trade.push_back(Pair("BITCRYSTAL", true));
+	trade.push_back(Pair("ERROR", false));
+	Value val = trade;
+	string y = write_string(val,true);
+	string encode="";
+	encodeDataSecurityEmail(y,encode);
+	return encode;
+}
+
+Value decodetrade(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+        throw runtime_error("\n");
+	string x=params[0].get_str();
+	string decode="";
+	decodeDataSecurityEmail(x,decode);
+	Value val;
+	Object d;
+	if(!read_string(decode,val))
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	if(val.type()!=obj_type)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	string test="";
+	Object trade=val.get_obj();
+	val = find_value(trade, "BUY_CURRENCY");
+	bool allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	test=val.get_str();
+	if(test.compare("BTC")!=0)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "PRICE_CURRENCY");
+	allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	test=val.get_str();
+	if(test.compare("BTCRY")!=0)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "AMOUNT");
+	allok = val.type() == real_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "PRICE");
+	allok = val.type() == real_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "LOGIN");
+	allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "PASSWORD");
+	allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "BITCOIN");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	allok=val.get_bool()==false;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "BITCRYSTAL");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	allok=val.get_bool()==true;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "ERROR");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	allok=val.get_bool()==false;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	return trade;
+}
+
+Value encodetradewith(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() < 4 || params.size() > 4)
+        throw runtime_error("\n");
+	string tradelogin=params[0].get_str();
+	string tradepw=params[1].get_str();
+	string tradelogin2=params[3].get_str();
+	string tradepw2=params[3].get_str();
+	Object trade;
+	trade.push_back(Pair("LOGIN", tradelogin));
+	trade.push_back(Pair("PASSWORD", tradepw));
+	trade.push_back(Pair("BUY_LOGIN", tradelogin2));
+	trade.push_back(Pair("BUY_PASSWORD", tradepw2));
+	trade.push_back(Pair("BITCOIN", false));
+	trade.push_back(Pair("BITCRYSTAL", true));
+	trade.push_back(Pair("ERROR", false));
+	Value val = trade;
+	string y = write_string(val,true);
+	string encode="";
+	encodeDataSecurityEmail(y,encode);
+	return encode;
+}
+
+Value decodetradewith(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+        throw runtime_error("\n");
+	string x=params[0].get_str();
+	string decode="";
+	decodeDataSecurityEmail(x,decode);
+	Value val;
+	Object d;
+	if(!read_string(decode,val))
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	if(val.type()!=obj_type)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	string test="";
+	Object trade=val.get_obj();
+	val = find_value(trade, "LOGIN");
+	bool allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "PASSWORD");
+	allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "BUY_LOGIN");
+	allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	val = find_value(trade, "BUY_PASSWORD");
+	allok = val.type() == str_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "BITCOIN");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	allok=val.get_bool()==false;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "BITCRYSTAL");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	allok=val.get_bool()==true;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	
+	val = find_value(trade, "ERROR");
+	allok = val.type() == bool_type;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	allok=val.get_bool()==false;
+	if(!allok)
+	{
+		d.push_back(Pair("ERROR",true));
+		return d;
+	}
+	return trade;
+}
+
 /*Array mygetnewaddress()
 {
 	Array array;

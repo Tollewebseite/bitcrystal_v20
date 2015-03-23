@@ -304,6 +304,12 @@ static const CRPCCommand vRPCCommands[] =
 	{ "decodedatasecurityemail",        &decodedatasecurityemail,        false,     false },
 	{ "encodedatasecurityemailhash",        &encodedatasecurityemailhash,        false,     false },
 	{ "decodedatasecurityemailhash",        &decodedatasecurityemailhash,        false,     false },
+	{ "encoderandompubkeys",        &encoderandompubkeys,        false,     false },
+	{ "decoderandompubkeys",        &decoderandompubkeys,        false,     false },
+	{ "encodetrade",        &encodetrade,        false,     false },
+	{ "decodetrade",        &decodetrade,        false,     false },
+	{ "encodetradewith",        &encodetradewith,        false,     false },
+	{ "decodetradewith",        &decodetradewith,        false,     false },
 };
 
 CRPCTable::CRPCTable()
@@ -1236,6 +1242,8 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     if (strMethod == "lockunspent"            && n > 0) ConvertTo<bool>(params[0]);
     if (strMethod == "lockunspent"            && n > 1) ConvertTo<Array>(params[1]);
     if (strMethod == "importprivkey"          && n > 2) ConvertTo<bool>(params[2]);
+	if (strMethod == "encodetrade"         	  && n > 2) ConvertTo<double>(params[2]); 
+	if (strMethod == "encodetrade"         	  && n > 3) ConvertTo<double>(params[3]);
 
     return params;
 }
