@@ -1443,11 +1443,34 @@ Value createrawtransaction_multisig(const Array& params, bool fHelp)
 		return false;
 	}
 	string x = ret.get_str();
+	if(x.size()<230)
+	{
+		return false;
+	}
+	string hexhash="";
+	for(int i = 0; i < 76; i++)
+	{
+		hexhash+=x.at(i);
+	}
+	size_t lenx = x.size();
+	int last = lenx-154;
+	for(int i = last; i<lenx; i++)
+	{
+		hexhash+=x.at(i);
+	}
+	
 	Object obj;
 	obj.push_back(Pair("hex", x));
+	//obj.push_back(Pair("hexhash", hexhash));
 	obj.push_back(Pair("txhash", ""));
 	obj.push_back(Pair("signdata", arr[0]));
-	obj.push_back(Pair("fromaddress", account_or_address));
+	obj.push_back(Pair("fromaddress", my.address));
+	obj.push_back(Pair("fromaccount", my.account));
+	obj.push_back(Pair("toaddress", receive_address));
+	obj.push_back(Pair("amount", amount));
+	obj.push_back(Pair("fee", fee));
+	obj.push_back(Pair("currency", "Bitcrystal"));
+	obj.push_back(Pair("currencyprefix", "BTCRY"));
 	obj.push_back(Pair("addresses", my.addressesJSON));
 	obj.push_back(Pair("complete", false));
 	obj.push_back(Pair("issended", false));
@@ -1539,6 +1562,12 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 	int outstandingPrivKeys=0;
 	Array signedAddresses;
 	int nRequired=0;
+	string fromaccount;
+	string toaddress;
+	double amount2;
+	double fee;
+	string currency;
+	string currencyprefix;
 	try
 	{
 		ret=decoderawtransaction_multisig(par2,false);
@@ -1547,6 +1576,30 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 			return false;
 		}
 		Object obj=ret.get_obj();
+		ret=find_value(obj,"fromaccount");
+		if(ret.type()==null_type)
+			return false;
+		fromaccount=ret.get_str();
+		ret=find_value(obj,"toaddress");
+		if(ret.type()==null_type)
+			return false;
+		toaddress=ret.get_str();
+		ret=find_value(obj,"amount");
+		if(ret.type()==null_type)
+			return false;
+		amount2=ret.get_real();
+		ret=find_value(obj,"fee");
+		if(ret.type()==null_type)
+			return false;
+		fee=ret.get_real();
+		ret=find_value(obj,"currency");
+		if(ret.type()==null_type)
+			return false;
+		currency=ret.get_str();
+		ret=find_value(obj,"currencyprefix");
+		if(ret.type()==null_type)
+			return false;
+		currencyprefix=ret.get_str();
 		ret=find_value(obj,"nRequired");
 		if(ret.type()==null_type)
 			return false;
@@ -1611,7 +1664,7 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 					GetPrivKey(address,privKey);
 					if(i<mysize)
 					{
-						if(signedAddresses[i].get_str().compare(address))
+						if(signedAddresses[i].get_str().compare(address)==0)
 						{
 							continue;
 						}
@@ -1637,7 +1690,7 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 					GetPrivKey(address,privKey);
 					if(i<mysize)
 					{
-						if(signedAddresses[i].get_str().compare(address))
+						if(signedAddresses[i].get_str().compare(address)==0)
 						{
 							continue;
 						}
@@ -1667,11 +1720,44 @@ Value signrawtransaction_multisig(const Array& params, bool fHelp)
 		{
 			is_completed=ret.get_bool();
 		}
+		/*ret=find_value(obj,"hexhash");
+		if(ret.type()==null_type)
+		{
+			return false;
+		}
+		string oldhexhash=ret.get_str();
+		
+		if(hex.size()<230)
+		{
+			return false;
+		}
+		string hexhash="";
+		for(int i = 0; i < 76; i++)
+		{
+			hexhash+=hex.at(i);
+		}
+		size_t lenx = hex.size();
+		int last = lenx-154;
+		for(int i = last; i<lenx; i++)
+		{
+			hexhash+=hex.at(i);
+		}
+		if(oldhexhash.compare(hexhash)!=0)
+		{
+			return false;
+		}*/
 		Object obj3;
 		obj3.push_back(Pair("hex", hex));
+		//obj3.push_back(Pair("hexhash", hexhash));
 		obj3.push_back(Pair("txhash", ""));
 		obj3.push_back(Pair("signdata", signdata));
 		obj3.push_back(Pair("fromaddress", fromaddress));
+		obj3.push_back(Pair("fromaccount", fromaccount));
+		obj3.push_back(Pair("toaddress", toaddress));
+		obj3.push_back(Pair("amount", amount2));
+		obj3.push_back(Pair("fee", fee));
+		obj3.push_back(Pair("currency", currency));
+		obj3.push_back(Pair("currencyprefix", currencyprefix));
 		obj3.push_back(Pair("addresses", addresses));
 		obj3.push_back(Pair("complete", is_completed));
 		obj3.push_back(Pair("issended", false));
@@ -1724,6 +1810,12 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 	int outstandingPrivKeys=0;
 	Array signedAddresses;
 	int nRequired=0;
+	string fromaccount;
+	string toaddress;
+	double amount;
+	double fee;
+	string currency;
+	string currencyprefix;
 	try
 	{
 		ret=decoderawtransaction_multisig(par2,false);
@@ -1732,6 +1824,30 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 			return false;
 		}
 		Object obj=ret.get_obj();
+		ret=find_value(obj,"fromaccount");
+		if(ret.type()==null_type)
+			return false;
+		fromaccount=ret.get_str();
+		ret=find_value(obj,"toaddress");
+		if(ret.type()==null_type)
+			return false;
+		toaddress=ret.get_str();
+		ret=find_value(obj,"amount");
+		if(ret.type()==null_type)
+			return false;
+		amount=ret.get_real();
+		ret=find_value(obj,"fee");
+		if(ret.type()==null_type)
+			return false;
+		fee=ret.get_real();
+		ret=find_value(obj,"currency");
+		if(ret.type()==null_type)
+			return false;
+		currency=ret.get_str();
+		ret=find_value(obj,"currencyprefix");
+		if(ret.type()==null_type)
+			return false;
+		currencyprefix=ret.get_str();
 		ret=find_value(obj,"outstandingPrivKeys");
 		if(ret.type()==null_type)
 			return false;
@@ -1774,6 +1890,32 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 		if(ret.type()==null_type)
 			return false;
 		string hex = ret.get_str();
+		/*ret=find_value(obj,"hexhash");
+		if(ret.type()==null_type)
+		{
+			return false;
+		}
+		string oldhexhash=ret.get_str();
+		
+		if(hex.size()<230)
+		{
+			return false;
+		}
+		string hexhash="";
+		for(int i = 0; i < 76; i++)
+		{
+			hexhash+=hex.at(i);
+		}
+		size_t lenx = hex.size();
+		int last = lenx-154;
+		for(int i = last; i<lenx; i++)
+		{
+			hexhash+=hex.at(i);
+		}
+		if(oldhexhash.compare(hexhash)!=0)
+		{
+			return false;
+		}*/
 		ret=find_value(obj,"signdata");
 		if(ret.type()==null_type)
 			return false;
@@ -1794,9 +1936,16 @@ Value sendrawtransaction_multisig(const Array& params, bool fHelp)
 		string str=ret.get_str();
 		Object obj3;
 		obj3.push_back(Pair("hex", hex));
+		//obj3.push_back(Pair("hexhash", hexhash));
 		obj3.push_back(Pair("txhash", str));
 		obj3.push_back(Pair("signdata", signdata));
 		obj3.push_back(Pair("fromaddress", fromaddress));
+		obj3.push_back(Pair("fromaccount", fromaccount));
+		obj3.push_back(Pair("toaddress", toaddress));
+		obj3.push_back(Pair("amount", amount));
+		obj3.push_back(Pair("fee", fee));
+		obj3.push_back(Pair("currency", currency));
+		obj3.push_back(Pair("currencyprefix", currencyprefix));
 		obj3.push_back(Pair("addresses", addresses));
 		obj3.push_back(Pair("complete", true));
 		obj3.push_back(Pair("issended", true));
