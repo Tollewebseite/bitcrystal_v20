@@ -3194,6 +3194,77 @@ Value decodetradewith(const Array& params, bool fHelp)
 	return trade;
 }
 
+void encodeDataSecurityEmailNeutral(string &y, string & encodevalue)
+{
+	try
+	{
+		size_t len = y.length();
+		string encode = encodeBase64Data((unsigned char*)y.c_str(),len);
+		len = encode.length();
+		encode = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		len = encode.length();
+		encode = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		len = encode.length();
+		encode = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		len = encode.length();
+		encode = encode_security_neutral(encode.c_str(), len);
+		len = encode.length();
+		string encode2 = encodeBase64Data((unsigned char*)encode.c_str(),len);
+		encodevalue=encode2;
+	} catch (...) {
+		y="";
+		encodevalue="";
+	}
+}
+
+void decodeDataSecurityEmailNeutral(string &str, string & decodevalue)
+{
+	try
+	{
+		vector<unsigned char> cpy;
+		size_t size;
+		decodeBase64Data(str, cpy, size);
+		char ptr[size];
+		decodeEnding(cpy,(unsigned char*)&ptr[0],size);
+		str="";
+		str.resize(size,0);
+		char * current = (char*)str.c_str();
+		for(int i = 0; i < size;i++)
+		{
+			current[i]=ptr[i];
+		}
+		string str2=decode_security_neutral(str);
+		string ret=decodeBase64DataLight(str2);
+		ret=decodeBase64DataLight(ret);
+		ret=decodeBase64DataLight(ret);
+		ret=decodeBase64DataLight(ret);
+		decodevalue=ret;
+	} catch (...) {
+		str="";
+		decodevalue="";
+	}
+}
+
+Value encodedatasecurityemailneutral(const Array& params, bool fHelp)
+{
+		if (fHelp || params.size() != 1)
+			throw runtime_error("encodedatasecurityemailneutral <encrypted base64 encoded string>\n");
+		string str = params[0].get_str();
+		string encodevalue="";
+		encodeDataSecurityEmailNeutral(str,encodevalue);
+		return encodevalue;
+}
+
+Value decodedatasecurityemailneutral(const Array& params, bool fHelp)
+{
+		if (fHelp || params.size() != 1)
+			throw runtime_error("decodedatasecurityemailneutral <encrypted base64 encoded string>\n");
+		string str = params[0].get_str();
+		string decodevalue="";
+		decodeDataSecurityEmailNeutral(str,decodevalue);
+		return decodevalue;
+}
+
 /*Array mygetnewaddress()
 {
 	Array array;
