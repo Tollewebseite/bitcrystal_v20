@@ -2047,6 +2047,399 @@ Value signandsendrawtransaction_multisig(const Array& params, bool fHelp)
 	}
 }
 
+Value testtransactionequals_multisig(const Array& params, bool fHelp)
+{
+	bool allok=false;
+	if (fHelp || params.size() < 2 || params.size() > 3)
+			throw runtime_error("testtransactionequals_multisig <encrypted base64 encoded string> <encrypted base64 encoded string>\n");
+	string x=params[0].get_str();
+	string y=params[1].get_str();
+	bool set=params.size()==3;
+	Array par1;
+	Array par2;
+	par1.push_back(x);
+	par2.push_back(y);
+	Value ret;
+	Object transaction1;
+	Object transaction2;
+	string hex1;
+	string hex2;
+	string txhash1;
+	string txhash2;
+	Array signdata1;
+	Array signdata2;
+	string fromaddress1;
+	string fromaddress2;
+	string fromaccount1;
+	string fromaccount2;
+	string toaddress1;
+	string toaddress2;
+	double amount1;
+	double amount2;
+	double fee1;
+	double fee2;
+	string currency1;
+	string currency2;
+	string currencyprefix1;
+	string currencyprefix2;
+	Array addresses1;
+	Array addresses2;
+	bool complete1;
+	bool complete2;
+	bool issended1;
+	bool issended2;
+	Array usedunspenttxids1;
+	Array usedunspenttxids2;
+	int usedunspenttxidsamount1;
+	int usedunspenttxidsamount2;
+	int minconfirmations1;
+	int minconfirmations2;
+	int outstandingPrivKeys1;
+	int outstandingPrivKeys2;
+	int nRequired1;
+	int nRequired2;
+	Array signedAddresses1;
+	Array signedAddresses2;
+	try
+	{
+		ret=decoderawtransaction_multisig(par1,false);
+		if(ret.type()!=obj_type)
+		{
+			return false;
+		}
+		transaction1=ret.get_obj();
+		ret=decoderawtransaction_multisig(par2,false);
+		if(ret.type()!=obj_type)
+		{
+			return false;
+		}
+		transaction2=ret.get_obj();
+		
+		ret=find_value(transaction1,"hex");
+		if(ret.type()!=str_type)
+			return false;
+		hex1=ret.get_str();
+		ret=find_value(transaction2,"hex");
+		if(ret.type()!=str_type)
+			return false;
+		hex2=ret.get_str();
+		ret=find_value(transaction1,"txhash");
+		if(ret.type()!=str_type)
+			return false;
+		txhash1=ret.get_str();
+		ret=find_value(transaction2,"txhash");
+		if(ret.type()!=str_type)
+			return false;
+		txhash2=ret.get_str();
+		ret=find_value(transaction1,"signdata");
+		if(ret.type()!=array_type)
+			return false;
+		signdata1=ret.get_array();
+		ret=find_value(transaction2,"signdata");
+		if(ret.type()!=array_type)
+			return false;
+		signdata2=ret.get_array();
+		
+		ret=find_value(transaction1,"fromaddress");
+		if(ret.type()!=str_type)
+			return false;
+		fromaddress1=ret.get_str();
+		ret=find_value(transaction2,"fromaddress");
+		if(ret.type()!=str_type)
+			return false;
+		fromaddress2=ret.get_str();
+		ret=find_value(transaction1,"fromaccount");
+		if(ret.type()!=str_type)
+			return false;
+		fromaccount1=ret.get_str();
+		ret=find_value(transaction2,"fromaccount");
+		if(ret.type()!=str_type)
+			return false;
+		fromaccount2=ret.get_str();
+		ret=find_value(transaction1,"toaddress");
+		if(ret.type()!=str_type)
+			return false;
+		toaddress1=ret.get_str();
+		ret=find_value(transaction2,"toaddress");
+		if(ret.type()!=str_type)
+			return false;
+		toaddress2=ret.get_str();
+		ret=find_value(transaction1,"amount");
+		if(ret.type()!=real_type)
+			return false;
+		amount1=ret.get_real();
+		ret=find_value(transaction2,"amount");
+		if(ret.type()!=real_type)
+			return false;
+		amount2=ret.get_real();
+		ret=find_value(transaction1,"fee");
+		if(ret.type()!=real_type)
+			return false;
+		fee1=ret.get_real();
+		ret=find_value(transaction2,"fee");
+		if(ret.type()!=real_type)
+			return false;
+		fee2=ret.get_real();
+		ret=find_value(transaction1,"currency");
+		if(ret.type()!=str_type)
+			return false;
+		currency1=ret.get_str();
+		ret=find_value(transaction2,"currency");
+		if(ret.type()!=str_type)
+			return false;
+		currency2=ret.get_str();
+		ret=find_value(transaction1,"currencyprefix");
+		if(ret.type()!=str_type)
+			return false;
+		currencyprefix1=ret.get_str();
+		ret=find_value(transaction2,"currencyprefix");
+		if(ret.type()!=str_type)
+			return false;
+		currencyprefix2=ret.get_str();
+		ret=find_value(transaction1,"addresses");
+		if(ret.type()!=array_type)
+			return false;
+		addresses1=ret.get_array();
+		ret=find_value(transaction2,"addresses");
+		if(ret.type()!=array_type)
+			return false;
+		addresses2=ret.get_array();
+		ret=find_value(transaction1,"complete");
+		if(ret.type()!=bool_type)
+			return false;
+		complete1=ret.get_bool();
+		ret=find_value(transaction2,"complete");
+		if(ret.type()!=bool_type)
+			return false;
+		complete2=ret.get_bool();
+		ret=find_value(transaction1,"issended");
+		if(ret.type()!=bool_type)
+			return false;
+		issended1=ret.get_bool();
+		ret=find_value(transaction2,"issended");
+		if(ret.type()!=bool_type)
+			return false;
+		issended2=ret.get_bool();
+		ret=find_value(transaction1,"usedunspenttxids");
+		if(ret.type()!=array_type)
+			return false;
+		usedunspenttxids1=ret.get_array();
+		ret=find_value(transaction2,"usedunspenttxids");
+		if(ret.type()!=array_type)
+			return false;
+		usedunspenttxids2=ret.get_array();
+		ret=find_value(transaction1,"minconfirmations");
+		if(ret.type()!=int_type)
+			return false;
+		minconfirmations1=ret.get_int();
+		ret=find_value(transaction2,"minconfirmations");
+		if(ret.type()!=int_type)
+			return false;
+		minconfirmations2=ret.get_int();
+		ret=find_value(transaction1,"outstandingPrivKeys");
+		if(ret.type()!=int_type)
+			return false;
+		outstandingPrivKeys1=ret.get_int();
+		ret=find_value(transaction2,"outstandingPrivKeys");
+		if(ret.type()!=int_type)
+			return false;
+		outstandingPrivKeys2=ret.get_int();
+		ret=find_value(transaction1,"nRequired");
+		if(ret.type()!=int_type)
+			return false;
+		nRequired1=ret.get_int();
+		ret=find_value(transaction2,"nRequired");
+		if(ret.type()!=int_type)
+			return false;
+		nRequired2=ret.get_int();
+		ret=find_value(transaction1,"signedAddresses");
+		if(ret.type()!=array_type)
+			return false;
+		signedAddresses1=ret.get_array();
+		ret=find_value(transaction2,"signedAddresses");
+		if(ret.type()!=array_type)
+			return false;
+		signedAddresses2=ret.get_array();
+		int size = signdata1.size();
+		if(size!=signdata2.size())
+		{
+			return false;
+		}
+		for(int i = 0; i < size; i++)
+		{
+			ret=signdata1[i];
+			if(ret.type()!=obj_type)
+			{
+				return false;
+			}
+			Object signdata1_obj=ret.get_obj();
+			ret=signdata2[i];
+			if(ret.type()!=obj_type)
+			{
+				return false;
+			}
+			Object signdata2_obj=ret.get_obj();
+			ret=find_value(signdata1_obj, "txid");
+			if(ret.type()!=str_type)
+				return false;
+			string txid1=ret.get_str();
+			ret=find_value(signdata2_obj, "txid");
+			if(ret.type()!=str_type)
+				return false;
+			string txid2=ret.get_str();
+			ret=find_value(signdata1_obj, "vout");
+			if(ret.type()!=int_type)
+				return false;
+			int vout1=ret.get_int();
+			ret=find_value(signdata2_obj, "vout");
+			if(ret.type()!=int_type)
+				return false;
+			int vout2=ret.get_int();
+			ret=find_value(signdata1_obj, "scriptPubKey");
+			if(ret.type()!=str_type)
+				return false;
+			string scriptPubKey1=ret.get_str();
+			ret=find_value(signdata2_obj, "scriptPubKey");
+			if(ret.type()!=str_type)
+				return false;
+			string scriptPubKey2=ret.get_str();
+			ret=find_value(signdata1_obj, "redeemScript");
+			if(ret.type()!=str_type)
+				return false;
+			string redeemScript1=ret.get_str();
+			ret=find_value(signdata2_obj, "redeemScript");
+			if(ret.type()!=str_type)
+				return false;
+			string redeemScript2=ret.get_str();
+			if(txid1.compare(txid2)!=0)
+			{
+				return false;
+			}
+			if(vout1!=vout2)
+			{
+				return false;
+			}
+			if(scriptPubKey1.compare(scriptPubKey2)!=0)
+			{
+				return false;
+			}
+			if(redeemScript1.compare(redeemScript2)!=0)
+			{
+				return false;
+			}
+		}
+		size = addresses1.size();
+		if(size!=addresses2.size())
+		{
+			return false;
+		}
+		for(int i = 0; i < size; i++)
+		{
+			if(addresses1[i].get_str().compare(addresses2[i].get_str())!=0)
+			{
+				return false;
+			}
+		}
+		size = usedunspenttxids1.size();
+		if(size!=usedunspenttxids2.size())
+		{
+			return false;
+		}
+		for(int i = 0; i < size; i++)
+		{
+			if(usedunspenttxids1[i].get_str().compare(usedunspenttxids2[i].get_str())!=0)
+			{
+				return false;
+			}
+		}
+		size = signedAddresses1.size();
+		if(size!=signedAddresses2.size())
+		{
+			return false;
+		}
+		for(int i = 0; i < size; i++)
+		{
+			if(signedAddresses1[i].get_str().compare(signedAddresses2[i].get_str())!=0)
+			{
+				return false;
+			}
+		}
+		if(!set)
+		{
+			if(hex1.compare(0, 98, hex2.substr(0,98))!=0)
+			{
+				return false;
+			}
+		}
+		if(txhash2.compare(txhash1)!=0)
+		{
+			return false;
+		}
+		if(fromaddress2.compare(fromaddress1)!=0)
+		{
+			return false;
+		}
+		if(fromaccount2.compare(fromaccount1)!=0)
+		{
+			return false;
+		}
+		if(toaddress2.compare(toaddress1)!=0)
+		{
+			return false;
+		}
+		if(amount1!=amount2)
+		{
+			return false;
+		}
+		if(fee1!=fee2)
+		{
+			return false;
+		}
+		if(currency2.compare(currency1)!=0)
+		{
+			return false;
+		}
+		if(currencyprefix2.compare(currencyprefix1)!=0)
+		{
+			return false;
+		}
+		if(complete1!=complete2)
+		{
+			return false;
+		}
+		if(issended1!=issended2)
+		{
+			return false;
+		}
+		if(usedunspenttxidsamount1!=usedunspenttxidsamount2)
+		{
+			return false;
+		}
+		if(minconfirmations1!=minconfirmations2)
+		{
+			return false;
+		}
+		if(outstandingPrivKeys1!=outstandingPrivKeys2)
+		{
+			return false;
+		}
+		if(nRequired1!=nRequired2)
+		{
+			return false;
+		}
+	} catch (runtime_error ex) {
+		allok=false;
+		return allok;
+	} catch (Object ex) {
+		allok=false;
+		return allok;
+	} catch (std::exception ex) {
+		allok=false;
+		return allok;
+	}
+	return true;
+}
+
 void encodeDataSecurityEx(string &y, string & encodevalue)
 {
 	try

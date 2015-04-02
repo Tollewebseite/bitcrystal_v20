@@ -312,6 +312,7 @@ static const CRPCCommand vRPCCommands[] =
 	{ "decodetrade",        &decodetrade,        false,     false },
 	{ "encodetradewith",        &encodetradewith,        false,     false },
 	{ "decodetradewith",        &decodetradewith,        false,     false },
+	{ "testtransactionequals_multisig",        &testtransactionequals_multisig,        false,     false },
 };
 
 CRPCTable::CRPCTable()
