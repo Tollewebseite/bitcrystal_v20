@@ -77,6 +77,7 @@ OBJS= \
 	obj/base64.o \
 	obj/random.o \
 	obj/base_security.o \
+	obj/base_security_neutral.o \
     obj/alert.o \
     obj/version.o \
     obj/checkpoints.o \
