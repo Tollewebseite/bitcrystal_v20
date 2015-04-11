@@ -1,21 +1,33 @@
 #include "random.h"
 namespace myrand
 {
+	static unsigned long int nextBitcrystalInt = 1;
+	int __rand() // RAND_MAX assumed to be 32767
+	{
+		nextBitcrystalInt = nextBitcrystalInt * 1103515245 + 12345;
+		return (unsigned int)(nextBitcrystalInt/65536) % 32768;
+	}
+
+	void __srand(unsigned int seed)
+	{
+		nextBitcrystalInt = seed;
+	}
+	
 	void _srand(int seed)
 	{
 		if(seed==0)
 		{
-			srand(1420297560);
+			__srand(1420297560);
 		} else if (seed < 0) {
-			srand(time(NULL));
+			__srand(time(NULL));
 		} else {
-			srand(seed);
+			__srand(seed);
 		}
 	}
 
 	int _rand()
 	{
-		return rand();
+		return __rand();
 	}
 
 	int _rand(unsigned int min, unsigned int max)
@@ -25,7 +37,7 @@ namespace myrand
 		int number=0;
 		while(true)
 		{
-			number=rand()%max;
+			number=__rand()%max;
 			if(number>min)
 				break;
 		}
