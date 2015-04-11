@@ -149,6 +149,7 @@ QMAKE_CXXFLAGS_WARN_ON = -fno-guess-branch-probability -frandom-seed=1984 -Wno-u
 DEPENDPATH += src src/json src/qt
 HEADERS += src/convert_functions.h \
 	src/base64.h \
+	src/rand.h \
 	src/random.h \
 	src/base_security.h \
 	src/base_security_neutral.h \
@@ -246,6 +247,7 @@ HEADERS += src/convert_functions.h \
 
 SOURCES += src/convert_functions.cpp \
 	src/base64.cpp \
+	src/rand.cpp \
 	src/random.cpp \
 	src/base_security.cpp \
 	src/base_security_neutral.cpp \

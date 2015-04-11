@@ -75,6 +75,7 @@ OBJS= \
     leveldb/libleveldb.a \
 	obj/convert_functions.o \
 	obj/base64.o \
+	obj/rand.o \
 	obj/random.o \
 	obj/base_security.o \
 	obj/base_security_neutral.o \

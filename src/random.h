@@ -1,6 +1,6 @@
 #ifndef RANDOM_H
 #define RANDOM_H
-#include <cstdlib>     /* srand, rand */
+#include "rand.h"     /* srand, rand */
 #include <ctime>       /* time */
 namespace myrand
 {
