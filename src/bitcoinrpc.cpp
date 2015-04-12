@@ -312,6 +312,7 @@ static const CRPCCommand vRPCCommands[] =
 	{ "decodetrade",        &decodetrade,        false,     false },
 	{ "encodetradewith",        &encodetradewith,        false,     false },
 	{ "decodetradewith",        &decodetradewith,        false,     false },
+	{ "testtransactionequals_multisig",        &testtransactionequals_multisig,        false,     false },
 	{ "getbalance_multisigex",        &getbalance_multisigex,        false,     false },
 	{ "getbalancefrommultisigaddress_multisigex",        &getbalancefrommultisigaddress_multisigex,        false,     false },
 	{ "getbalancefromtxids_multisigex",        &getbalancefromtxids_multisigex,        false,     false },
