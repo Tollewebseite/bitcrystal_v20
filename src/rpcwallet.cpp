@@ -353,6 +353,7 @@ bool GetMultisigDataFromAddress(std::string & address, my_multisigaddress & my)
 			my.clear();
 			my.account=setAddresses.at(i).account;
 			my.address=setAddresses.at(i).address;
+			my.addresses=setAddresses.at(i).addresses;
 			my.redeemScript=setAddresses.at(i).redeemScript;
 			my.addressesJSON=setAddresses.at(i).addressesJSON;
 			my.nRequired=setAddresses.at(i).nRequired;
@@ -376,6 +377,7 @@ bool GetMultisigAccountAddress(string & strAccount, my_multisigaddress & my)
 	my.account=setAddress.at(0).account;
 	my.address=setAddress.at(0).address;
 	my.redeemScript=setAddress.at(0).redeemScript;
+	my.addresses=setAddress.at(0).addresses;
 	my.addressesJSON=setAddress.at(0).addressesJSON;
 	my.nRequired=setAddress.at(0).nRequired;
 	my.empty=false;

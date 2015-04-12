@@ -835,11 +835,14 @@ Value my_outputrawtransaction(const Array& params, bool fHelp)
 	return t;
 }
 
-bool getrawtransactionlist(std::string & account, vector<my_rawtransactionlist> & my_transactions)
+bool getrawtransactionlist(std::string & account, vector<my_rawtransactionlist> & my_transactions, int & transactions)
 {
+	if(transactions<=0)
+		transactions=0;
 	Value ret;
 	Array par;
 	par.push_back(account);
+	par.push_back(transactions);
 	bool allok=true;
 	try {
 		ret = listtransactions(par, false);
@@ -962,10 +965,24 @@ bool getrawtransactionlist(std::string & account, vector<my_rawtransactionlist> 
 	return allok;
 }
 
-bool getrawtransactionlist_multisig(std::string & account, vector<my_rawtransactionlist> & my_transactions)
+bool getrawtransactionlist_multisig(std::string & account, vector<my_rawtransactionlist> & my_transactions, int & transactions)
 {
+	if(transactions<=0)
+	{
+		transactions=0;
+	}
+	my_multisigaddress my;
+	if(!hasRedeemScript(account))
+	{
+		if(!GetMultisigAccountAddress(account,my))
+		{
+				return false;
+		}
+		account=my.address;
+	}
 	vector<my_rawtransactionlist> my_transactions2;
-	bool allok = getrawtransactionlist(account, my_transactions2);
+	string xxx="";
+	bool allok = getrawtransactionlist(xxx, my_transactions2, transactions);
 	if(my_transactions2.size() == 0 || !allok)
 	{
 		return false;
@@ -975,20 +992,327 @@ bool getrawtransactionlist_multisig(std::string & account, vector<my_rawtransact
 	{
 		if(!hasRedeemScript(my_transactions2.at(i).address))
 			continue;
+		if(my_transactions2.at(i).address.compare(account)!=0)
+			continue;
 		my_transactions.push_back(my_transactions2.at(i));
 	}
 	allok=my_transactions.size()!=0;
 	return allok;
 }
 
+bool getbalancefrommultisigaddress(std::string & account_or_address, double & balance, int & transactions, int & minconfirmations)
+{
+	if(transactions<=0)
+	{
+		transactions=0;
+	}
+	if(minconfirmations<=0)
+	{
+		minconfirmations=0;
+	}
+	my_multisigaddress my;
+	if(!hasRedeemScript(account_or_address))
+	{
+		if(!GetMultisigAccountAddress(account_or_address,my))
+		{
+				balance=-1;
+				return false;
+		}
+		account_or_address=my.address;
+	}
+	bool allok = GetMultisigDataFromAddress(account_or_address,my);
+	if(!allok)
+	{
+		balance=-1;
+		return false;
+	}
+	double mybalance=0;
+	int vsize = my.addresses.size();
+	int havePrivKeysSize=0;
+	string m = "";
+	for(int i = 0; i < vsize; i++)
+	{
+		m = my.addresses.at(i);
+		if(hasPrivKey(m))
+		{
+			havePrivKeysSize++;
+		}
+	}
+	if(havePrivKeysSize>=vsize)
+	{
+		balance=-1;
+		return false;
+	}
+	if(havePrivKeysSize<=0)
+	{
+		balance=-1;
+		return false;
+	}
+	vector<my_rawtransactionlist> my_transactions;
+	allok = getrawtransactionlist_multisig(account_or_address, my_transactions, transactions);
+	if(!allok)
+	{
+		balance=-1;
+		return false;
+	}
+	vsize = my_transactions.size();
+	for(int i = 0; i < vsize; i++)
+	{
+		if(my_transactions.at(i).category.compare("send")!=0)
+		{
+			continue;
+		}
+		if(my_transactions.at(i).confirmations<minconfirmations)
+		{
+			continue;
+		}
+		double amount=my_transactions.at(i).amount;
+		if(amount>=0)
+		{
+			continue;
+		}
+		amount=amount*-1;
+		mybalance+=amount;
+	}
+	if(mybalance<=0)
+	{
+		balance=-1;
+		return false;
+	}
+	balance=mybalance;
+	return true;
+}
+
+bool getbalancefromtxids(std::string & account_or_address, double & balance, int & minconfirmations, vector<std::string> & txids)
+{
+	if(minconfirmations <= 0)
+	{
+		minconfirmations=0;
+	}
+	if(txids.size()==0)
+	{
+		balance=-1;
+		return false;
+	}
+	my_multisigaddress mya;
+	if(!hasRedeemScript(account_or_address))
+	{
+		if(!GetMultisigAccountAddress(account_or_address,mya))
+		{
+				balance=-1;
+				return false;
+		}
+		account_or_address=mya.address;
+	}
+	bool allok = GetMultisigDataFromAddress(account_or_address,mya);
+	if(!allok)
+	{
+		balance=-1;
+		return false;
+	}
+	int vsize = mya.addresses.size();
+	int havePrivKeysSize=0;
+	string m = "";
+	for(int i = 0; i < vsize; i++)
+	{
+		m = mya.addresses.at(i);
+		if(hasPrivKey(m))
+		{
+			havePrivKeysSize++;
+		}
+	}
+	if(havePrivKeysSize>=vsize)
+	{
+		balance=-1;
+		return false;
+	}
+	if(havePrivKeysSize<=0)
+	{
+		balance=-1;
+		return false;
+	}
+	int txids_size = txids.size();
+	my_rawtransactioninformation my;
+	double mybalance=0;
+	for(int i = 0; i < txids_size; i++)
+	{
+		my.clear();
+		allok = getrawtransactiondetails(txids.at(i), my);
+		if(!allok)
+		{
+			balance=-1;
+			return false;
+		}
+		if(my.confirmations<minconfirmations)
+		{
+			balance=-1;
+			return false;
+		}
+		if(my.vout.size()==0)
+		{
+			balance=-1;
+			return false;
+		}
+		int vout_size = my.vout.size();
+		double temp = 0;
+		for(int j = 0; j < vout_size; j++)
+		{
+			if(my.vout.at(j).scriptPubKey.type.compare("scripthash")!=0)
+			{
+				continue;
+			}
+			int vsize = my.vout.at(j).scriptPubKey.addresses.size();
+			if(vsize!=1)
+			{
+				continue;
+			}
+			if(my.vout.at(j).scriptPubKey.addresses[0].get_str().compare(account_or_address)!=0)
+			{
+				continue;
+			}
+			temp+=my.vout.at(j).value;
+		}
+		if(temp==0)
+		{
+			balance=-1;
+			return false;
+		}
+		mybalance+=temp;
+	}
+	if(mybalance==0)
+	{
+		balance=-1;
+		return false;
+	}
+	balance=mybalance;
+	return true;
+}
+
+bool getsendedtxidsfrommultisigaddress(std::string & account_or_address, vector<std::string> & txids, int & transactions, int & minconfirmations)
+{
+	if(transactions<=0)
+	{
+		transactions=0;
+	}
+	if(minconfirmations<=0)
+	{
+		minconfirmations=0;
+	}
+	my_multisigaddress my;
+	if(!hasRedeemScript(account_or_address))
+	{
+		if(!GetMultisigAccountAddress(account_or_address,my))
+		{
+				return false;
+		}
+		account_or_address=my.address;
+	}
+	bool allok = GetMultisigDataFromAddress(account_or_address,my);
+	if(!allok)
+	{
+		return false;
+	}
+	int vsize = my.addresses.size();
+	int havePrivKeysSize=0;
+	string m = "";
+	for(int i = 0; i < vsize; i++)
+	{
+		m = my.addresses.at(i);
+		if(hasPrivKey(m))
+		{
+			havePrivKeysSize++;
+		}
+	}
+	if(havePrivKeysSize>=vsize)
+	{
+		return false;
+	}
+	if(havePrivKeysSize<=0)
+	{
+		return false;
+	}
+	vector<my_rawtransactionlist> my_transactions;
+	allok = getrawtransactionlist_multisig(account_or_address, my_transactions, transactions);
+	if(!allok)
+	{
+		return false;
+	}
+	vsize = my_transactions.size();
+	for(int i = 0; i < vsize; i++)
+	{
+		if(my_transactions.at(i).category.compare("send")!=0)
+		{
+			continue;
+		}
+		if(my_transactions.at(i).confirmations<minconfirmations)
+		{
+			continue;
+		}
+		double amount=my_transactions.at(i).amount;
+		if(amount>=0)
+		{
+			continue;
+		}
+		txids.push_back(my_transactions.at(i).txid);
+	}
+	if(txids.size()==0)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool getbalance_multisig(std::string & account, double & balance, int & transactions, int & minconfirmations)
+{
+	if(transactions<=0)
+	{
+		transactions=0;
+	}
+	if(minconfirmations<=0)
+	{
+		minconfirmations=0;
+	}
+	double mybalance=0;
+	double temp = 0;
+	vector<my_multisigaddress> setAddresses;
+	bool allok = GetMultisigAccountAddresses(account, setAddresses);
+	if(!allok)
+	{
+		balance=-1;
+		return false;
+	}
+	int size = setAddresses.size();
+	for(int i = 0; i < size; i++)
+	{
+		allok = getbalancefrommultisigaddress(setAddresses.at(i).address, temp, transactions, minconfirmations);
+		if(!allok||temp<=0)
+		{
+			balance=-1;
+			return false;
+		}
+		mybalance+=temp;
+	}
+	balance=mybalance;
+	return true;
+}
+
 Value listtransactions_multisig(const Array& params, bool fHelp)
 {
-	if (fHelp || params.size() != 1)
-        throw runtime_error("listtransactions_multisig <multisigaddress or account>\n");
+	if (fHelp || params.size() > 2)
+        throw runtime_error("listtransactions_multisig <multisigaddress or account> [<number to list>]\n");
 	vector<my_rawtransactionlist> my_transactions;
 	string x = "";
+	int transactions = 0;
 	x+=params[0].get_str();
-	bool allok = getrawtransactionlist_multisig(x, my_transactions);
+	if(params.size()==2)
+	{
+		transactions=params[1].get_int();
+		if(transactions<=0)
+		{
+			transactions = 0;
+		}
+	}
+	bool allok = getrawtransactionlist_multisig(x, my_transactions, transactions);
 	Array arr;
 	if(my_transactions.size() == 0 || !allok)
 	{
@@ -1276,6 +1600,115 @@ Value getmultisigaddressofaddressoraccount(const Array& params, bool fHelp)
 	return x;
 }
 
+bool buildtransactionfromtxids_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & mytxids, Array & params)
+{
+try
+{
+	int txids_size=mytxids.size();
+	if(txids_size==0)
+	{
+		return false;
+	}
+	vector<std::string> txids;
+	for(int i = 0; i < txids_size; i++)
+	{
+		txids.push_back(mytxids[i].get_str());
+	}
+	if(minconfirmations<0)
+	{
+		minconfirmations=0;
+	}
+	if(fee<0)
+		fee=0;
+	my_multisigaddress my;
+	if(!hasRedeemScript(account_or_address))
+	{
+		if(!GetMultisigAccountAddress(account_or_address,my))
+		{
+				return false;
+		}
+		account_or_address=my.address;
+	}
+	bool allok3 = GetMultisigDataFromAddress(account_or_address,my);
+	if(!allok3)
+		return false;
+	if(amount <= 0 || fee < 0)
+		return false;
+	if(amount<=fee)
+		return false;
+	double thisbalance = 0;
+	bool allok2 = getbalancefromtxids(account_or_address, thisbalance, minconfirmations, txids);
+	if(!allok2)
+	{
+		return false;
+	}
+	if(thisbalance<=0||thisbalance<amount+fee)
+	{
+		return false;
+	}
+	string change_address;
+	string change_account="multisig_change_address";
+	bool allok = mygetnewaddress(change_account, change_address);
+	if(!allok)
+		return false;
+	Array arr;
+	double tAmount=amount+fee;
+	double currentAmount = 0;
+	my_rawtransactioninformation my_transaction;
+	Array arr2;
+	Array paramsR;
+	for(int i = 0; i < txids_size; i++)
+	{
+			if(currentAmount >= tAmount)
+			{
+				break;
+			}
+			my_transaction.clear();
+			allok = getrawtransactiondetails(txids.at(i), my_transaction);
+			if(!allok)
+			{
+				return false;
+			}
+			
+			Object obj;
+			int v_size = my_transaction.vout.size();
+			for(int j = 0; j < v_size; j++)
+			{
+				if(my_transaction.vout.at(j).scriptPubKey.addresses.size()!=1)
+					continue;
+				if(my_transaction.vout.at(j).scriptPubKey.addresses[0].get_str().compare(account_or_address)!=0)
+					continue;
+				obj.push_back(Pair("txid", txids.at(i)));
+				obj.push_back(Pair("vout", my_transaction.vout.at(j).n));
+				obj.push_back(Pair("scriptPubKey",  my_transaction.vout.at(j).scriptPubKey.hex));
+				obj.push_back(Pair("redeemScript", my.redeemScript));
+			
+				if(my_transaction.confirmations>=minconfirmations)
+				{
+					arr2.push_back(txids.at(i));
+					arr.push_back(obj);
+					currentAmount+=my_transaction.vout.at(j).value;
+				}
+			}
+			if(i+1==txids_size&&currentAmount < tAmount)
+			{
+				return false;
+			}
+	}
+	paramsR.push_back(arr);
+	Object obj2;
+	double diff=currentAmount-amount-fee;
+	obj2.push_back(Pair(receive_address,amount));
+	if(diff>0)
+		obj2.push_back(Pair(change_address,diff));
+	paramsR.push_back(obj2);
+	params.push_back(paramsR);
+	params.push_back(arr2);
+} catch (...) {
+	return false;
+}
+}
+
 bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & params)
 {
 try
@@ -1352,6 +1785,127 @@ try
 }
 }
 
+Value getbalance_multisigex(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+        throw runtime_error("getbalance_multisigex <account>\n");
+	string account = params[0].get_str();
+	double balance=0;
+	int minconfirmations=1;
+	int transactions=1000000;
+	bool allok=getbalance_multisig(account, balance, transactions, minconfirmations);
+	if(!allok||balance<=0)
+	{
+		return 0;
+	}
+	return balance;
+}
+
+Value getbalancefrommultisigaddress_multisigex(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+        throw runtime_error("getbalancefrommultisigaddress_multisigex <account_or_address>\n");
+	string account = params[0].get_str();
+	double balance=0;
+	int minconfirmations=1;
+	int transactions=1000000;
+	bool allok=getbalancefrommultisigaddress(account, balance, transactions, minconfirmations);
+	if(!allok||balance<=0)
+	{
+		return 0;
+	}
+	return balance;
+}
+
+Value getbalancefromtxids_multisigex(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 2)
+        throw runtime_error("getbalancefromtxids_multisigex <account_or_address> <txids_hash>\n");
+	string account = params[0].get_str();
+	string txids_hash = params[1].get_str();
+	string ret="";
+	decodeDataSecurityEx(txids_hash,ret);
+	Value val;
+	Array mytxids;
+	if(read_string(ret,val)&&val.type()==array_type)
+	{
+		mytxids=val.get_array();
+	} else {
+		return 0;
+	}
+	if(mytxids.size()==0)
+	{
+		return 0;
+	}
+	vector<std::string> txids;
+	int v_size=mytxids.size();
+	for(int i = 0; i < v_size; i++)
+	{
+		txids.push_back(mytxids[i].get_str());
+	}
+	double balance=0;
+	int minconfirmations=1;
+	bool allok=getbalancefromtxids(account, balance, minconfirmations, txids);
+	if(!allok||balance<=0)
+	{
+		return minconfirmations;
+		return 0;
+	}
+	return balance;
+}
+
+Value getsendedtxidsfrommultisigaddressex_multisigex(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+        throw runtime_error("getsendedtxidsfrommultisigaddressex_multisigex <account_or_address>\n");
+	string account = params[0].get_str();
+	vector<std::string> txids;
+	int transactions = 1000000;
+	int minconfirmations=1;
+	bool allok = getsendedtxidsfrommultisigaddress(account, txids, transactions, minconfirmations);
+	if(!allok)
+	{
+		return false;
+	}
+	if(txids.size()==0)
+	{
+		return false;
+	}
+	Array mytxids;
+	int v_size = txids.size();
+	for(int i = 0; i < v_size; i++)
+	{
+		mytxids.push_back(txids.at(i));
+	}
+	Value val = mytxids;
+	string x = write_string(val,true);
+	string encode = "";
+	encodeDataSecurityEx(x,encode);
+	return encode;
+}	
+
+Value decodetxidshash(const Array& params, bool fHelp)
+{
+	if (fHelp || params.size() != 1)
+        throw runtime_error("decodetxidshash <txids hash>\n");
+	string txids_hash = params[0].get_str();
+	string ret="";
+	decodeDataSecurityEx(txids_hash,ret);
+	Value val;
+	Array mytxids;
+	if(read_string(ret,val)&&val.type()==array_type)
+	{
+		mytxids=val.get_array();
+	} else {
+		return false;
+	}
+	if(mytxids.size()==0)
+	{
+		return false;
+	}
+	return mytxids;
+}
+
 Value createtransaction_multisig(const Array& params, bool fHelp)
 {
 	if (fHelp || params.size() < 4 || params.size() > 5)
@@ -1385,8 +1939,8 @@ Value createtransaction_multisig(const Array& params, bool fHelp)
 
 Value createrawtransaction_multisig(const Array& params, bool fHelp)
 {
-	if (fHelp || params.size() < 4 || params.size() > 6)
-        throw runtime_error("createrawtransaction_multisig <account_or_address> <receive_address> <amount> <fee> [<minconfirmations>] [<set>]\n"
+	if (fHelp || params.size() < 4 || params.size() > 7)
+        throw runtime_error("createrawtransaction_multisig <account_or_address> <receive_address> <amount> <fee> [<minconfirmations>] [<txids hash>] [<set>]\n"
 							"minconfirmations is a optional parameter and is the value of confirmations that a unspent txid transaction at least must have\n"
 							"to can build the transaction, default is 0 if you not set this parameter\n"
 							"set is a optional parameter and if set is true then the output is a object\n"
@@ -1395,15 +1949,33 @@ Value createrawtransaction_multisig(const Array& params, bool fHelp)
 	string receive_address=params[1].get_str();
 	double amount = params[2].get_real();
 	double fee = params[3].get_real();
-	bool set = params.size()==6;
+	bool set = params.size()==7;
 	int minconfirmations = 0;
+	Array mytxids;
 	if(params.size()>=5)
 	{
 		minconfirmations=params[4].get_int();
 	}
+	if(params.size()>=6)
+	{
+		string txids_hash=params[5].get_str();
+		string ret="";
+		decodeDataSecurityEx(txids_hash,ret);
+		Value val;
+		if(read_string(ret,val)&&val.type()==array_type)
+		{
+			mytxids=val.get_array();
+		}
+	}
 	Array arr;
 	Array arrtmp;
-	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, minconfirmations, arr);
+	bool allok = false;
+	if(mytxids.size()==0)
+	{
+		allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, minconfirmations, arr);
+	} else {
+		allok = buildtransactionfromtxids_multisig(account_or_address, receive_address, amount, fee, minconfirmations, mytxids, arr);
+	}
 	if(!allok)
 	{
 		arr.clear();

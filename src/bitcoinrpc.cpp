@@ -312,7 +312,11 @@ static const CRPCCommand vRPCCommands[] =
 	{ "decodetrade",        &decodetrade,        false,     false },
 	{ "encodetradewith",        &encodetradewith,        false,     false },
 	{ "decodetradewith",        &decodetradewith,        false,     false },
-	{ "testtransactionequals_multisig",        &testtransactionequals_multisig,        false,     false },
+	{ "getbalance_multisigex",        &getbalance_multisigex,        false,     false },
+	{ "getbalancefrommultisigaddress_multisigex",        &getbalancefrommultisigaddress_multisigex,        false,     false },
+	{ "getbalancefromtxids_multisigex",        &getbalancefromtxids_multisigex,        false,     false },
+	{ "getsendedtxidsfrommultisigaddressex_multisigex",        &getsendedtxidsfrommultisigaddressex_multisigex,        false,     false },
+	{ "decodetxidshash",        &decodetxidshash,        false,     false },
 };
 
 CRPCTable::CRPCTable()
@@ -1213,7 +1217,8 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     if (strMethod == "sendfrom"               && n > 3) ConvertTo<boost::int64_t>(params[3]);
     if (strMethod == "listtransactions"       && n > 1) ConvertTo<boost::int64_t>(params[1]);
     if (strMethod == "listtransactions"       && n > 2) ConvertTo<boost::int64_t>(params[2]);
-    if (strMethod == "listaccounts"           && n > 0) ConvertTo<boost::int64_t>(params[0]);
+    if (strMethod == "listtransactions_multisig"       && n > 1) ConvertTo<boost::int64_t>(params[1]);
+	if (strMethod == "listaccounts"           && n > 0) ConvertTo<boost::int64_t>(params[0]);
     if (strMethod == "walletpassphrase"       && n > 1) ConvertTo<boost::int64_t>(params[1]);
     if (strMethod == "getblocktemplate"       && n > 0) ConvertTo<Object>(params[0]);
     if (strMethod == "listsinceblock"         && n > 1) ConvertTo<boost::int64_t>(params[1]);

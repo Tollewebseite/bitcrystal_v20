@@ -476,8 +476,8 @@ extern void decodeDataSecurityEmailNeutral(std::string &str, std::string & decod
 extern void encodeDataSecurityEmailHash(std::string &y, std::string & encodevalue);
 extern void decodeDataSecurityEmailHash(std::string &y, std::string & decodevalue);
 extern bool getrawtransactiondetails(std::string & txid, my_rawtransactioninformation & my);
-extern bool getrawtransactionlist(std::string & account, std::vector<my_rawtransactionlist> & my_transactions);
-extern bool getrawtransactionlist_multisig(std::string & account, std::vector<my_rawtransactionlist> & my_transactions);
+extern bool getrawtransactionlist(std::string & account, std::vector<my_rawtransactionlist> & my_transactions, int & transactions);
+extern bool getrawtransactionlist_multisig(std::string & account, std::vector<my_rawtransactionlist> & my_transactions, int & transactions);
 extern bool getrawlistunspent(std::vector<my_rawlistunspent> & my_unspenttransactions);
 extern bool getrawlistunspent_multisig(std::vector<my_rawlistunspent> & my_unspenttransactions);
 extern bool getrawlistunspentbyinformation_multisig(std::string & address_or_account, std::vector<my_rawlistunspent> & my_unspenttransactions);
@@ -512,6 +512,11 @@ extern void decodeDataSecurityEx(std::string &str, std::string & decodevalue);
 extern bool GetMultisigAddressOfAddressOrAccount(std::string & account_or_address);
 extern int GetTotalConfirmationsOfTxids(const json_spirit::Array & txids);
 extern int GetAverageConfirmationsOfTxids(const json_spirit::Array & txids);
+extern bool buildtransactionfromtxids_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, json_spirit::Array & mytxids, json_spirit::Array & params);
+extern bool getbalance_multisig(std::string & account, double & balance, int & transactions, int & minconfirmations);
+extern bool getsendedtxidsfrommultisigaddress(std::string & account_or_address, std::vector<std::string> & txids, int & transactions, int & minconfirmations);
+extern bool getbalancefrommultisigaddress(std::string & account, double & balance, int & transactions, int & minconfirmations);
+extern bool getbalancefromtxids(std::string & account_or_address, double & balance, int & minconfirmations, std::vector<std::string> & txids);
 json_spirit::Object JSONRPCError(int code, const std::string& message);
 
 void StartRPCThreads();
@@ -693,4 +698,9 @@ extern json_spirit::Value decodetrade(const json_spirit::Array& params, bool fHe
 extern json_spirit::Value encodetradewith(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value decodetradewith(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
 extern json_spirit::Value testtransactionequals_multisig(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getbalance_multisigex(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getbalancefrommultisigaddress_multisigex(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getbalancefromtxids_multisigex(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value getsendedtxidsfrommultisigaddressex_multisigex(const json_spirit::Array& params, bool fHelp); // in rpcdump.cpp
+extern json_spirit::Value decodetxidshash(const json_spirit:: Array& params, bool fHelp);
 #endif
