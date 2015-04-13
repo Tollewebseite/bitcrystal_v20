@@ -1058,6 +1058,10 @@ bool getbalancefrommultisigaddress(std::string & account_or_address, double & ba
 	vsize = my_transactions.size();
 	for(int i = 0; i < vsize; i++)
 	{
+		if(my_transactions.at(i).address.compare(account_or_address)!=0)
+		{
+			continue;
+		}
 		if(my_transactions.at(i).category.compare("send")!=0)
 		{
 			continue;
@@ -1240,6 +1244,10 @@ bool getsendedtxidsfrommultisigaddress(std::string & account_or_address, vector<
 	vsize = my_transactions.size();
 	for(int i = 0; i < vsize; i++)
 	{
+		if(my_transactions.at(i).address.compare(account_or_address)!=0)
+		{
+			continue;
+		}
 		if(my_transactions.at(i).category.compare("send")!=0)
 		{
 			continue;
