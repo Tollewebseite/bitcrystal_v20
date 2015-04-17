@@ -487,7 +487,7 @@ extern bool GetMultisigAccountAddress(std::string & strAccount, my_multisigaddre
 extern bool GetMultisigDataFromAddress(std::string & address, my_multisigaddress & my);
 extern bool hasRedeemScript(std::string address);
 extern bool mygetnewaddress(std::string strAccount, std::string & myaddress);
-extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, json_spirit::Array & arr10x, json_spirit::Array & params);
+extern bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, json_spirit::Array & params);
 extern bool GetPrivKey(std::string & address, std::string & privKey);
 extern bool hasPrivKey(std::string & address);
 extern bool GetPubKey(std::string & address, std::string & pubKey);
@@ -512,7 +512,7 @@ extern void decodeDataSecurityEx(std::string &str, std::string & decodevalue);
 extern bool GetMultisigAddressOfAddressOrAccount(std::string & account_or_address);
 extern int GetTotalConfirmationsOfTxids(const json_spirit::Array & txids);
 extern int GetAverageConfirmationsOfTxids(const json_spirit::Array & txids);
-extern bool buildtransactionfromtxids_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, json_spirit::Array & mytxids, json_spirit::Array & arr10x, json_spirit::Array & params);
+extern bool buildtransactionfromtxids_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, json_spirit::Array & mytxids, json_spirit::Array & params);
 extern bool getbalance_multisig(std::string & account, double & balance, int & transactions, int & minconfirmations);
 extern bool getsendedtxidsfrommultisigaddress(std::string & account_or_address, std::vector<std::string> & txids, int & transactions, int & minconfirmations);
 extern bool getbalancefrommultisigaddress(std::string & account, double & balance, int & transactions, int & minconfirmations);

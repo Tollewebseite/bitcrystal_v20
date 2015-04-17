@@ -1608,15 +1608,13 @@ Value getmultisigaddressofaddressoraccount(const Array& params, bool fHelp)
 	return x;
 }
 
-bool buildtransactionfromtxids_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & mytxids, Array & arr10x, Array & params)
+bool buildtransactionfromtxids_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & mytxids, Array & params)
 {
-arr10x.push_back("1613");
 try
 {
 	int txids_size=mytxids.size();
 	if(txids_size==0)
 	{
-		arr10x.push_back("1618");
 		return false;
 	}
 	vector<std::string> txids;
@@ -1635,7 +1633,6 @@ try
 	{
 		if(!GetMultisigAccountAddress(account_or_address,my))
 		{
-				arr10x.push_back("1637");
 				return false;
 		}
 		account_or_address=my.address;
@@ -1643,29 +1640,24 @@ try
 	bool allok3 = GetMultisigDataFromAddress(account_or_address,my);
 	if(!allok3)
 	{
-		arr10x.push_back("1646");
 		return false;
 	}
 	if(amount <= 0 || fee < 0)
 	{
-		arr10x.push_back("1650");
 		return false;
 	}
 	if(amount<=fee)
 	{
-		arr10x.push_back("1655");
 		return false;
 	}
 	double thisbalance = 0;
 	bool allok2 = getbalancefromtxids(account_or_address, thisbalance, minconfirmations, txids);
 	if(!allok2)
 	{
-		arr10x.push_back("1663");
 		return false;
 	}
 	if(thisbalance<=0||thisbalance<amount+fee)
 	{
-		arr10x.push_back("1668");
 		return false;
 	}
 	string change_address;
@@ -1673,7 +1665,6 @@ try
 	bool allok = mygetnewaddress(change_account, change_address);
 	if(!allok)
 	{
-		arr10x.push_back("1675");
 		return false;
 	}
 	Array arr;
@@ -1692,7 +1683,6 @@ try
 			allok = getrawtransactiondetails(txids.at(i), my_transaction);
 			if(!allok)
 			{
-				arr10x.push_back("1694");
 				return false;
 			}
 			
@@ -1718,7 +1708,6 @@ try
 			}
 			if(i+1==txids_size&&currentAmount < tAmount)
 			{
-				arr10x.push_back("1720");
 				return false;
 			}
 	}
@@ -1733,14 +1722,12 @@ try
 	params.push_back(arr2);
 	return true;
 } catch (...) {
-	arr10x.push_back("1734");
 	return false;
 }
 }
 
-bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & arr10x, Array & params)
+bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & params)
 {
-arr10x.push_back("1741");
 try
 {
 	if(minconfirmations<0)
@@ -1754,19 +1741,16 @@ try
 	{
 		if(!GetMultisigAccountAddress(account_or_address,my))
 		{
-				arr10x.push_back("1754");
 				return false;
 		}
 		account_or_address=my.address;
 	}
 	if(amount <= 0 || fee < 0)
 	{
-		arr10x.push_back("1761");
 		return false;
 	}
 	if(amount<=fee)
 	{
-		arr10x.push_back("1766");
 		return false;
 	}
 	string change_address;
@@ -1774,14 +1758,12 @@ try
 	bool allok = mygetnewaddress(change_account, change_address);
 	if(!allok)
 	{
-		arr10x.push_back("1774");
 		return false;
 	}
 	std::vector<my_rawlistunspent> my_unspenttransactions;
 	allok = getrawlistunspentbyinformation_multisig(account_or_address, my_unspenttransactions);
 	if(!allok)
 	{
-		arr10x.push_back("1781");
 		return false;
 	}
 	Array arr;
@@ -1809,7 +1791,6 @@ try
 			}
 			if(i+1==size&&currentAmount < tAmount)
 			{
-				arr10x.push_back("1808");
 				return false;
 			}
 	}
@@ -1824,7 +1805,6 @@ try
 	params.push_back(arr2);
 	return true;
 } catch (...) {
-	arr10x.push_back("1823");
 	return false;
 }
 }
@@ -1965,8 +1945,7 @@ Value createtransaction_multisig(const Array& params, bool fHelp)
 	}
 	Array arr;
 	Array arr2;
-	Array arr10x;
-	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, minconfirmations, arr10x, arr);
+	bool allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, minconfirmations, arr);
 	if(!allok)
 	{
 		return arr2;
@@ -2013,16 +1992,13 @@ Value createrawtransaction_multisig(const Array& params, bool fHelp)
 	}
 	Array arr;
 	Array arrtmp;
-	Array arr10x;
 	bool allok = false;
 	if(mytxids.size()==0)
 	{
-		allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, minconfirmations, arr10x, arr);
+		allok = buildtransaction_multisig(account_or_address, receive_address, amount, fee, minconfirmations, arr);
 	} else {
-		allok = buildtransactionfromtxids_multisig(account_or_address, receive_address, amount, fee, minconfirmations, mytxids, arr10x, arr);
+		allok = buildtransactionfromtxids_multisig(account_or_address, receive_address, amount, fee, minconfirmations, mytxids, arr);
 	}
-	arr10x.push_back(allok);
-	return arr10x;
 	if(!allok)
 	{
 		arr.clear();
