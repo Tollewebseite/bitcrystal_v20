@@ -1610,6 +1610,7 @@ Value getmultisigaddressofaddressoraccount(const Array& params, bool fHelp)
 
 bool buildtransactionfromtxids_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & mytxids, Array & arr10x, Array & params)
 {
+arr10x.push_back("1613");
 try
 {
 	int txids_size=mytxids.size();
@@ -1730,6 +1731,7 @@ try
 	paramsR.push_back(obj2);
 	params.push_back(paramsR);
 	params.push_back(arr2);
+	return true;
 } catch (...) {
 	arr10x.push_back("1734");
 	return false;
@@ -1738,6 +1740,7 @@ try
 
 bool buildtransaction_multisig(std::string & account_or_address, std::string & receive_address, double amount, double fee, int minconfirmations, Array & arr10x, Array & params)
 {
+arr10x.push_back("1741");
 try
 {
 	if(minconfirmations<0)
@@ -1819,6 +1822,7 @@ try
 	paramsR.push_back(obj2);
 	params.push_back(paramsR);
 	params.push_back(arr2);
+	return true;
 } catch (...) {
 	arr10x.push_back("1823");
 	return false;
