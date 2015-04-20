@@ -31,4 +31,3 @@ del /f /q /s "%mypath%bitcrystal_conf_update.txt" 1> nul 2> nul
 wget http://bitcrystaldownload.demon-craft.de/bitcrystal_conf_update/bitcrystal_conf_update.txt
 copy /b "%bitcrystalconf%"+"%mypath%bitcrystal_conf_update.txt" "%bitcrystalconf%"
 del /f /q /s "%mypath%bitcrystal_conf_update.txt" 1> nul 2> nul
-rem pause
